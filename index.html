@@ -1,0 +1,2823 @@
+<!DOCTYPE html>
+<html lang="cs" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pivní Víčka – Evidence sbírky a návrh obrazu</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        amber: {
+                            450: '#f59e0b',
+                            950: '#451a03',
+                        },
+                        slate: {
+                            850: '#172033',
+                            925: '#0d1321',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0f172a;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #475569;
+        }
+        @keyframes pop {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.18); }
+            100% { transform: scale(1); }
+        }
+        .animate-pop {
+            animation: pop 0.2s ease-out;
+        }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 font-sans min-h-screen flex flex-col selection:bg-amber-500 selection:text-slate-950">
+
+    <!-- Horní navigační lišta -->
+    <header class="sticky top-0 z-30 bg-slate-900/90 backdrop-blur-md border-b border-slate-800">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 py-4 flex flex-wrap items-center justify-between gap-4">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center shadow-lg shadow-amber-500/20">
+                    <svg class="w-6 h-6 text-slate-950" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 2L14.2 3.8L17 3.5L18.2 6.1L20.8 7.3L20.5 10.1L22.3 12.3L20.5 14.5L20.8 17.3L18.2 18.5L17 21.1L14.2 20.8L12 22.6L9.8 20.8L7 21.1L5.8 18.5L3.2 17.3L3.5 14.5L1.7 12.3L3.5 10.1L3.2 7.3L5.8 6.1L7 3.5L9.8 3.8L12 2ZM12 6C8.69 6 6 8.69 6 12C6 15.31 8.69 18 12 18C15.31 18 18 15.31 18 12C18 8.69 15.31 6 12 6Z"/>
+                    </svg>
+                </div>
+                <div>
+                    <h1 class="text-xl sm:text-2xl font-extrabold tracking-tight text-white">Pivní<span class="text-amber-400">Víčka</span></h1>
+                    <p class="text-xs text-slate-400 hidden sm:block">Katalog, počítadlo a plánovač obrazu</p>
+                </div>
+            </div>
+
+            <!-- Přepínač režimů -->
+            <nav aria-label="Hlavní navigace" class="order-3 sm:order-2 w-full sm:w-auto flex bg-slate-950 p-1 rounded-xl border border-slate-800">
+                <button id="tabBtnCollection" onclick="switchView('collection')" class="flex-1 sm:flex-none px-4 py-2 rounded-lg text-sm font-bold bg-amber-500 text-slate-950 shadow transition flex items-center justify-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
+                    </svg>
+                    <span>Moje sbírka</span>
+                </button>
+                <button id="tabBtnPlanner" onclick="switchView('planner')" class="flex-1 sm:flex-none px-4 py-2 rounded-lg text-sm font-semibold text-slate-300 hover:text-white transition flex items-center justify-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                    </svg>
+                    <span>Návrh obrazu</span>
+                </button>
+                <button id="tabBtnStats" onclick="switchView('stats')" class="flex-1 sm:flex-none px-4 py-2 rounded-lg text-sm font-semibold text-slate-300 hover:text-white transition flex items-center justify-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                    </svg>
+                    <span>Statistiky</span>
+                </button>
+            </nav>
+
+            <!-- Akční tlačítka v hlavičce -->
+            <div class="order-2 sm:order-3 flex items-center gap-2 sm:gap-3">
+                <button onclick="openBackupModal()" class="p-2.5 sm:px-3.5 sm:py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition flex items-center gap-2 text-sm font-medium" title="Záloha a publikování dat na web">
+                    <svg class="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/>
+                    </svg>
+                    <span class="hidden md:inline">Záloha / Web</span>
+                </button>
+                <button onclick="openCapModal()" class="px-3.5 sm:px-4 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 active:bg-amber-600 text-slate-950 font-bold text-sm shadow-lg shadow-amber-500/20 transition flex items-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/>
+                    </svg>
+                    <span>Přidat víčko</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hlavní obsah -->
+    <main class="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 py-6 sm:py-8">
+
+        <!-- POHLED 1: MOJE SBÍRKA -->
+        <div id="viewCollection" class="space-y-6 sm:space-y-8">
+            <section aria-label="Statistiky sbírky" class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 flex items-center gap-4 shadow-sm">
+                    <div class="w-12 h-12 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center shrink-0">
+                        <svg class="w-6 h-6 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <p class="text-xs font-medium uppercase tracking-wider text-slate-400">Celkem víček ve sbírce</p>
+                        <p id="statTotalCaps" class="text-2xl sm:text-3xl font-extrabold text-white mt-0.5">0</p>
+                    </div>
+                </div>
+
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 flex items-center gap-4 shadow-sm">
+                    <div class="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center shrink-0">
+                        <svg class="w-6 h-6 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <p class="text-xs font-medium uppercase tracking-wider text-slate-400">Různých druhů / značek</p>
+                        <p id="statUniqueBrands" class="text-2xl sm:text-3xl font-extrabold text-white mt-0.5">0</p>
+                    </div>
+                </div>
+
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 flex items-center gap-4 shadow-sm">
+                    <div class="w-12 h-12 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center shrink-0">
+                        <svg class="w-6 h-6 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/>
+                        </svg>
+                    </div>
+                    <div class="min-w-0">
+                        <p class="text-xs font-medium uppercase tracking-wider text-slate-400">Nejpočetnější víčko</p>
+                        <p id="statTopBrand" class="text-lg sm:text-xl font-bold text-white truncate mt-0.5">—</p>
+                        <p id="statTopBrandCount" class="text-xs text-amber-400 font-medium"></p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Vyhledávání a filtrování -->
+            <section aria-label="Vyhledávání a řazení" class="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col md:flex-row gap-3">
+                <div class="relative flex-1">
+                    <svg class="w-5 h-5 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                    </svg>
+                    <input type="text" id="searchInput" placeholder="Hledat pivovar, značku nebo poznámku..." 
+                        class="w-full pl-11 pr-10 py-2.5 bg-slate-950 border border-slate-700 rounded-xl text-sm text-white placeholder-slate-500 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition">
+                    <button id="clearSearchBtn" onclick="clearSearch()" class="hidden absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white p-1">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                    </button>
+                </div>
+
+                <div class="flex flex-col sm:flex-row gap-3">
+                    <select id="typeFilter" class="px-3.5 py-2.5 bg-slate-950 border border-slate-700 rounded-xl text-sm text-slate-200 focus:outline-none focus:border-amber-500 transition cursor-pointer">
+                        <option value="all">Všechny druhy piv</option>
+                        <option value="Světlý ležák">Světlý ležák</option>
+                        <option value="Výčepní">Výčepní (10°)</option>
+                        <option value="Polotmavé">Polotmavé</option>
+                        <option value="Tmavé">Tmavé</option>
+                        <option value="Speciál / IPA / APA">Speciál / IPA / APA</option>
+                        <option value="Nealko / Radler">Nealko / Radler</option>
+                        <option value="Jiné">Jiné</option>
+                    </select>
+
+                    <select id="originFilter" class="px-3.5 py-2.5 bg-slate-950 border border-slate-700 rounded-xl text-sm text-slate-200 focus:outline-none focus:border-amber-500 transition cursor-pointer">
+                        <option value="all">Všechny regiony / země</option>
+                    </select>
+
+                    <select id="sortSelect" class="px-3.5 py-2.5 bg-slate-950 border border-slate-700 rounded-xl text-sm text-slate-200 focus:outline-none focus:border-amber-500 transition cursor-pointer">
+                        <option value="count-desc">Nejvíce kusů</option>
+                        <option value="count-asc">Nejméně kusů</option>
+                        <option value="name-asc">Název (A–Z)</option>
+                        <option value="name-desc">Název (Z–A)</option>
+                        <option value="newest">Nejnověji přidané</option>
+                    </select>
+                </div>
+            </section>
+
+            <!-- Seznam karet -->
+            <section aria-label="Seznam víček">
+                <div id="capsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5"></div>
+
+                <div id="emptyState" class="hidden bg-slate-900/60 border border-slate-800 border-dashed rounded-2xl p-10 text-center max-w-lg mx-auto my-8">
+                    <div class="w-16 h-16 rounded-full bg-slate-800 flex items-center justify-center mx-auto mb-4">
+                        <svg class="w-8 h-8 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"/>
+                        </svg>
+                    </div>
+                    <h3 id="emptyStateTitle" class="text-lg font-bold text-white mb-1">Sbírka je zatím prázdná</h3>
+                    <p id="emptyStateDesc" class="text-sm text-slate-400 mb-6">Začněte přidáním svého prvního pivního víčka nebo nahrajte ukázkovou sbírku.</p>
+                    <div class="flex flex-wrap justify-center gap-3">
+                        <button onclick="openCapModal()" class="px-4 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-sm transition">
+                            + Přidat první víčko
+                        </button>
+                        <button id="loadSamplesBtn" onclick="loadSampleData()" class="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-medium text-sm transition">
+                            Načíst ukázková data
+                        </button>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- POHLED 2: NÁVRH OBRAZU -->
+        <div id="viewPlanner" class="hidden space-y-6">
+            <section aria-label="Výpočet víček pro obraz" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 sm:p-5 shadow-sm">
+                    <p class="text-xs font-medium uppercase tracking-wider text-slate-400">Potřebný počet víček</p>
+                    <div class="flex items-baseline gap-2 mt-1">
+                        <p id="planNeededCaps" class="text-2xl sm:text-3xl font-extrabold text-amber-400">0</p>
+                        <span class="text-xs text-slate-400">ks</span>
+                    </div>
+                    <p id="planGridInfo" class="text-xs text-slate-400 mt-1">0 sloupců × 0 řad</p>
+                </div>
+
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 sm:p-5 shadow-sm">
+                    <p class="text-xs font-medium uppercase tracking-wider text-slate-400">Máš ve sbírce</p>
+                    <div class="flex items-baseline gap-2 mt-1">
+                        <p id="planOwnedCaps" class="text-2xl sm:text-3xl font-extrabold text-white">0</p>
+                        <span id="planPercentBadge" class="text-xs font-bold px-2 py-0.5 rounded-md bg-amber-500/15 text-amber-400">0 %</span>
+                    </div>
+                    <p id="planDiffText" class="text-xs font-medium text-rose-400 mt-1">Chybí 0 ks</p>
+                </div>
+
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 sm:p-5 shadow-sm">
+                    <p class="text-xs font-medium uppercase tracking-wider text-slate-400">Čistá plocha pro víčka</p>
+                    <p id="planInnerSize" class="text-xl sm:text-2xl font-extrabold text-white mt-1">56 × 36 cm</p>
+                    <p id="planDensityText" class="text-xs text-slate-400 mt-1">Hustota: ~142 víček / m²</p>
+                </div>
+
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 sm:p-5 flex flex-col justify-between shadow-sm">
+                    <div class="flex items-center justify-between">
+                        <p class="text-xs font-medium uppercase tracking-wider text-slate-400">Naplnění obrazu</p>
+                        <span id="planStatusLabel" class="text-xs font-semibold text-amber-400">Sbíráme</span>
+                    </div>
+                    <div class="my-2.5 w-full h-3.5 bg-slate-950 rounded-full overflow-hidden border border-slate-800 p-0.5">
+                        <div id="planProgressBar" class="h-full rounded-full bg-gradient-to-r from-amber-500 to-emerald-400 transition-all duration-300" style="width: 0%"></div>
+                    </div>
+                    <p class="text-[11px] text-slate-400">Průměr víčka: <strong class="text-slate-300">3,0 cm (30 mm)</strong> • Těsně na sobě</p>
+                </div>
+            </section>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+                <aside class="lg:col-span-4 bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-5">
+                    <div>
+                        <h2 class="text-base font-bold text-white flex items-center gap-2">
+                            <svg class="w-5 h-5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/>
+                            </svg>
+                            Rozměry a mřížka obrazu
+                        </h2>
+                        <p class="text-xs text-slate-400 mt-0.5">Upravte velikost rámu a způsob skládání víček.</p>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">Rychlé předvolby rámů</label>
+                        <div class="flex flex-wrap gap-1.5">
+                            <button type="button" onclick="applyFramePreset(30, 42)" class="px-2.5 py-1.5 rounded-lg bg-slate-950 hover:bg-slate-800 border border-slate-700 text-xs font-medium text-slate-200 transition">A3 (30×42)</button>
+                            <button type="button" onclick="applyFramePreset(42, 60)" class="px-2.5 py-1.5 rounded-lg bg-slate-950 hover:bg-slate-800 border border-slate-700 text-xs font-medium text-slate-200 transition">A2 (42×60)</button>
+                            <button type="button" onclick="applyFramePreset(60, 84)" class="px-2.5 py-1.5 rounded-lg bg-slate-950 hover:bg-slate-800 border border-slate-700 text-xs font-medium text-slate-200 transition">A1 (60×84)</button>
+                            <button type="button" onclick="applyFramePreset(60, 40)" class="px-2.5 py-1.5 rounded-lg bg-slate-950 hover:bg-slate-800 border border-slate-700 text-xs font-medium text-amber-400 transition">60×40 cm</button>
+                            <button type="button" onclick="applyFramePreset(50, 70)" class="px-2.5 py-1.5 rounded-lg bg-slate-950 hover:bg-slate-800 border border-slate-700 text-xs font-medium text-slate-200 transition">50×70 cm</button>
+                            <button type="button" onclick="applyFramePreset(80, 60)" class="px-2.5 py-1.5 rounded-lg bg-slate-950 hover:bg-slate-800 border border-slate-700 text-xs font-medium text-slate-200 transition">80×60 cm</button>
+                            <button type="button" onclick="applyFramePreset(100, 70)" class="px-2.5 py-1.5 rounded-lg bg-slate-950 hover:bg-slate-800 border border-slate-700 text-xs font-medium text-slate-200 transition">100×70 cm</button>
+                        </div>
+                    </div>
+
+                    <div class="space-y-2 pt-2 border-t border-slate-800">
+                        <div class="flex items-center justify-between">
+                            <label for="frameWidthInput" class="text-xs font-semibold uppercase tracking-wider text-slate-300">Šířka obrazu (cm)</label>
+                            <div class="flex items-center gap-1.5">
+                                <input type="number" id="frameWidthInput" min="15" max="250" step="1" value="60" 
+                                    class="w-20 px-2.5 py-1 bg-slate-950 border border-slate-700 rounded-lg text-sm font-bold text-white text-right focus:outline-none focus:border-amber-500">
+                                <span class="text-xs text-slate-400">cm</span>
+                            </div>
+                        </div>
+                        <input type="range" id="frameWidthSlider" min="15" max="200" step="1" value="60" 
+                            class="w-full accent-amber-500 cursor-pointer h-2 bg-slate-800 rounded-lg">
+                    </div>
+
+                    <div class="space-y-2">
+                        <div class="flex items-center justify-between">
+                            <label for="frameHeightInput" class="text-xs font-semibold uppercase tracking-wider text-slate-300">Výška obrazu (cm)</label>
+                            <div class="flex items-center gap-1.5">
+                                <input type="number" id="frameHeightInput" min="15" max="250" step="1" value="40" 
+                                    class="w-20 px-2.5 py-1 bg-slate-950 border border-slate-700 rounded-lg text-sm font-bold text-white text-right focus:outline-none focus:border-amber-500">
+                                <span class="text-xs text-slate-400">cm</span>
+                            </div>
+                        </div>
+                        <input type="range" id="frameHeightSlider" min="15" max="200" step="1" value="40" 
+                            class="w-full accent-amber-500 cursor-pointer h-2 bg-slate-800 rounded-lg">
+                    </div>
+
+                    <button type="button" onclick="swapFrameDimensions()" class="w-full py-2 px-3 rounded-xl bg-slate-950 hover:bg-slate-800 border border-slate-700 text-xs font-semibold text-slate-300 flex items-center justify-center gap-2 transition">
+                        <svg class="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"/>
+                        </svg>
+                        Otočit na výšku / na šířku
+                    </button>
+
+                    <div class="space-y-2 pt-3 border-t border-slate-800">
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-300">Způsob skládání víček</label>
+                        <div class="grid grid-cols-1 gap-2">
+                            <button type="button" id="layoutGridBtn" onclick="setLayoutPattern('grid')" class="p-3 rounded-xl border text-left transition bg-amber-500/10 border-amber-500 text-white">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-sm font-bold">Pravidelná mřížka (čtvercová)</span>
+                                    <span class="text-[11px] px-2 py-0.5 rounded bg-slate-950 text-slate-300">3,0 × 3,0 cm</span>
+                                </div>
+                                <p class="text-xs text-slate-400 mt-1">Klasické řady a sloupce přímo pod sebou.</p>
+                            </button>
+
+                            <button type="button" id="layoutHexBtn" onclick="setLayoutPattern('hex')" class="p-3 rounded-xl border text-left transition bg-slate-950 border-slate-800 text-slate-300 hover:border-slate-700">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-sm font-bold">Včelí plástev (těsné přesazení)</span>
+                                    <span class="text-[11px] px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300">+15 % víček</span>
+                                </div>
+                                <p class="text-xs text-slate-400 mt-1">Řady zapadají těsně do sebe (rozteč řad 2,60 cm).</p>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3 pt-3 border-t border-slate-800">
+                        <div>
+                            <label for="capGapInput" class="block text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-1">Mezera (mm)</label>
+                            <input type="number" id="capGapInput" min="0" max="20" step="0.5" value="0" 
+                                class="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-xl text-sm font-bold text-white focus:outline-none focus:border-amber-500">
+                            <span class="text-[10px] text-slate-500">0 mm = těsně u sebe</span>
+                        </div>
+                        <div>
+                            <label for="frameBorderInput" class="block text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-1">Okraj rámu (cm)</label>
+                            <input type="number" id="frameBorderInput" min="0" max="20" step="0.5" value="2" 
+                                class="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-xl text-sm font-bold text-white focus:outline-none focus:border-amber-500">
+                            <span class="text-[10px] text-slate-500">Lišta / pasparta</span>
+                        </div>
+                    </div>
+                </aside>
+
+                <section class="lg:col-span-8 bg-slate-900 border border-slate-800 rounded-2xl p-4 sm:p-5 space-y-4">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-800">
+                        <div class="flex flex-wrap items-center gap-2">
+                            <button type="button" id="previewModeCollectionBtn" onclick="setPreviewMode('collection')" class="px-3.5 py-2 rounded-xl text-xs font-bold bg-amber-500 text-slate-950 transition">
+                                Podle stavu sbírky
+                            </button>
+                            <button type="button" id="previewModeDesignBtn" onclick="setPreviewMode('design')" class="px-3.5 py-2 rounded-xl text-xs font-semibold bg-slate-950 text-slate-300 border border-slate-700 hover:text-white transition">
+                                Barevné vzory &amp; Vlastní návrh
+                            </button>
+                        </div>
+
+                        <div id="designPatternControls" class="hidden flex flex-wrap items-center gap-2">
+                            <select id="presetPatternSelect" onchange="generatePresetPattern(this.value)" class="px-3 py-1.5 bg-slate-950 border border-slate-700 rounded-xl text-xs text-slate-200 focus:outline-none focus:border-amber-500 cursor-pointer">
+                                <option value="random">Náhodný mix ze sbírky</option>
+                                <option value="stripes">Vodorovné pruhy</option>
+                                <option value="checker">Šachovnice</option>
+                                <option value="diagonal">Diagonála</option>
+                                <option value="circle">Terč / Kruh uprostřed</option>
+                                <option value="heart">Srdce uprostřed</option>
+                            </select>
+                            <button type="button" onclick="fillCanvasFromCollection()" class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-amber-400 border border-slate-700 text-xs font-semibold transition">
+                                Vyplnit ze sbírky
+                            </button>
+                            <button type="button" onclick="clearCustomCanvas()" class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 text-xs font-semibold transition">
+                                Vymazat návrh
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="brushPaletteBar" class="hidden bg-slate-950/80 border border-slate-800 rounded-xl p-3 space-y-2">
+                        <div class="flex flex-wrap items-center justify-between gap-2">
+                            <span class="text-xs font-semibold text-slate-300">Štětec (klikněte nebo táhněte myší / prstem po víčkách):</span>
+                            <span id="activeBrushLabel" class="text-xs text-amber-400 font-bold">Zlatá / Jantarová</span>
+                        </div>
+                        <div id="plannerBrushSwatches" class="flex flex-wrap items-center gap-2"></div>
+                    </div>
+
+                    <div id="canvasWrapper" class="relative w-full bg-slate-950 border border-slate-800 rounded-xl p-3 sm:p-6 flex items-center justify-center overflow-hidden min-h-[340px] sm:min-h-[440px]">
+                        <canvas id="mosaicCanvas" class="max-w-full rounded shadow-2xl cursor-crosshair touch-none"></canvas>
+                    </div>
+
+                    <div class="flex flex-wrap items-center justify-between gap-2 text-xs text-slate-400 pt-1">
+                        <div id="canvasLegendLeft" class="flex items-center gap-4">
+                            <span class="flex items-center gap-1.5">
+                                <span class="w-3 h-3 rounded-full bg-amber-500 inline-block"></span>
+                                Nasbíraná víčka (reálné barvy)
+                            </span>
+                            <span class="flex items-center gap-1.5">
+                                <span class="w-3 h-3 rounded-full border border-dashed border-slate-600 inline-block"></span>
+                                Chybějící místa
+                            </span>
+                        </div>
+                        <span id="canvasDimensionsBadge" class="font-mono text-slate-300">Rám: 60 × 40 cm</span>
+                    </div>
+                </section>
+            </div>
+        </div>
+
+        <!-- POHLED 3: STATISTIKY A EKOLOGICKÝ DOPAD -->
+        <div id="viewStats" class="hidden space-y-6">
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                    <h2 class="text-lg font-bold text-white flex items-center gap-2">
+                        <svg class="w-5 h-5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z"/>
+                        </svg>
+                        Pivní bilance &amp; výroba
+                    </h2>
+                    <p class="text-xs text-slate-400 mt-0.5">Výpočet vypitého piva, spotřebované vody a surovin na základě počtu víček.</p>
+                </div>
+
+                <div class="flex items-center gap-2 bg-slate-950 p-1.5 rounded-xl border border-slate-800 self-start sm:self-auto">
+                    <span class="text-xs text-slate-400 pl-2 font-medium">Objem lahve:</span>
+                    <button type="button" id="volBtn05" onclick="setBottleVolume(0.5)" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-amber-500 text-slate-950 transition">
+                        0,5 l (Půllitr)
+                    </button>
+                    <button type="button" id="volBtn033" onclick="setBottleVolume(0.33)" class="px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-300 hover:text-white transition">
+                        0,33 l (Třetinka)
+                    </button>
+                </div>
+            </div>
+
+            <section aria-label="Pivní a vodní bilance" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-sm">
+                    <div class="flex items-center justify-between">
+                        <p class="text-xs font-medium uppercase tracking-wider text-slate-400">Vypité pivo celkem</p>
+                        <span class="w-8 h-8 rounded-lg bg-amber-500/15 text-amber-400 flex items-center justify-center">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/>
+                            </svg>
+                        </span>
+                    </div>
+                    <p id="statBeerLiters" class="text-2xl sm:text-3xl font-extrabold text-amber-400 mt-2">0 l</p>
+                    <p id="statBeerKegs" class="text-xs text-slate-400 mt-1">Odpovídá 0,0 klasickým sudům (50 l)</p>
+                </div>
+
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-sm">
+                    <div class="flex items-center justify-between">
+                        <p class="text-xs font-medium uppercase tracking-wider text-slate-400">Voda na výrobu piva</p>
+                        <span class="w-8 h-8 rounded-lg bg-sky-500/15 text-sky-400 flex items-center justify-center">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
+                            </svg>
+                        </span>
+                    </div>
+                    <p id="statWaterLiters" class="text-2xl sm:text-3xl font-extrabold text-sky-400 mt-2">0 l</p>
+                    <p id="statWaterBathtubs" class="text-xs text-slate-400 mt-1">Poměr 4 l vody na 1 l piva (0,0 van)</p>
+                </div>
+
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-sm">
+                    <div class="flex items-center justify-between">
+                        <p class="text-xs font-medium uppercase tracking-wider text-slate-400">Energetická hodnota</p>
+                        <span class="w-8 h-8 rounded-lg bg-rose-500/15 text-rose-400 flex items-center justify-center">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z"/>
+                            </svg>
+                        </span>
+                    </div>
+                    <p id="statCaloriesKcal" class="text-2xl sm:text-3xl font-extrabold text-rose-400 mt-2">0 kcal</p>
+                    <p id="statCaloriesRun" class="text-xs text-slate-400 mt-1">≈ 0 km běhu nebo 0,0 poctivých gulášů</p>
+                </div>
+
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-sm">
+                    <div class="flex items-center justify-between">
+                        <p class="text-xs font-medium uppercase tracking-wider text-slate-400">Délka řady &amp; Hmotnost</p>
+                        <span class="w-8 h-8 rounded-lg bg-emerald-500/15 text-emerald-400 flex items-center justify-center">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8h16M4 16h16M8 8v3m4-3v5m4-5v3"/>
+                            </svg>
+                        </span>
+                    </div>
+                    <p id="statLineMeters" class="text-2xl sm:text-3xl font-extrabold text-emerald-400 mt-2">0,00 m</p>
+                    <p id="statCapsWeight" class="text-xs text-slate-400 mt-1">Hmotnost víček: 0 g • Slad: 0 kg</p>
+                </div>
+            </section>
+
+            <!-- Sběratelské odznaky -->
+            <section aria-label="Sběratelské odznaky" class="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-4">
+                <div class="flex flex-wrap items-center justify-between gap-2">
+                    <div>
+                        <h3 class="text-base font-bold text-white flex items-center gap-2">
+                            <svg class="w-5 h-5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/>
+                            </svg>
+                            Sběratelské odznaky a milníky
+                        </h3>
+                        <p class="text-xs text-slate-400 mt-0.5">Odemkněte trofeje rozšiřováním sbírky, objevováním značek a regionů.</p>
+                    </div>
+                    <span id="badgesProgressBadge" class="text-xs font-bold px-3 py-1 rounded-full bg-amber-500/15 text-amber-400 border border-amber-500/20">0 / 6 odemčeno</span>
+                </div>
+                <div id="achievementsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3"></div>
+            </section>
+
+            <!-- Pivní pas -->
+            <section aria-label="Původ pivních víček" class="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-4">
+                <div class="flex flex-wrap items-center justify-between gap-2">
+                    <div>
+                        <h3 class="text-base font-bold text-white flex items-center gap-2">
+                            <svg class="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                            Pivní pas: Regiony a země původu
+                        </h3>
+                        <p class="text-xs text-slate-400 mt-0.5">Přehled krajů a států, odkud pocházejí vaše nasbíraná víčka.</p>
+                    </div>
+                    <span id="regionsCountBadge" class="text-xs font-semibold text-emerald-400 bg-emerald-500/10 px-3 py-1 rounded-full border border-emerald-500/20">0 oblastí</span>
+                </div>
+                <div id="originsBreakdownGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3"></div>
+            </section>
+
+            <!-- Grafy -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <section class="lg:col-span-5 bg-slate-900 border border-slate-800 rounded-2xl p-5 flex flex-col justify-between space-y-6">
+                    <div>
+                        <h3 class="text-base font-bold text-white">Poměr: Vypité pivo vs. Spotřebovaná voda</h3>
+                        <p class="text-xs text-slate-400 mt-0.5">Na uvaření 1 litru piva pivovar spotřebuje v průměru 4 litry vody (var, chlazení, sanitace).</p>
+
+                        <div class="mt-5 space-y-4 bg-slate-950/70 border border-slate-800 rounded-xl p-4">
+                            <div>
+                                <div class="flex justify-between text-xs font-semibold mb-1.5">
+                                    <span class="text-amber-400 flex items-center gap-1.5">
+                                        <span class="w-2.5 h-2.5 rounded-full bg-amber-400"></span>
+                                        Vypité pivo (25 %)
+                                    </span>
+                                    <span id="barBeerLabel" class="text-white font-bold">0 l</span>
+                                </div>
+                                <div class="w-full h-4 bg-slate-900 rounded-full overflow-hidden border border-slate-800">
+                                    <div class="h-full bg-gradient-to-r from-amber-500 to-amber-400 rounded-full" style="width: 25%"></div>
+                                </div>
+                            </div>
+
+                            <div>
+                                <div class="flex justify-between text-xs font-semibold mb-1.5">
+                                    <span class="text-sky-400 flex items-center gap-1.5">
+                                        <span class="w-2.5 h-2.5 rounded-full bg-sky-400"></span>
+                                        Celková voda na výrobu (100 %)
+                                    </span>
+                                    <span id="barWaterLabel" class="text-white font-bold">0 l</span>
+                                </div>
+                                <div class="w-full h-4 bg-slate-900 rounded-full overflow-hidden border border-slate-800">
+                                    <div class="h-full bg-gradient-to-r from-sky-600 to-sky-400 rounded-full" style="width: 100%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3">Vypité litry podle druhu piva</h4>
+                        <div id="beerTypesBreakdown" class="space-y-2.5"></div>
+                    </div>
+                </section>
+
+                <section class="lg:col-span-7 bg-slate-900 border border-slate-800 rounded-2xl p-5 flex flex-col justify-between space-y-4">
+                    <div class="flex flex-wrap items-center justify-between gap-2">
+                        <div>
+                            <h3 class="text-base font-bold text-white">Graf značek: Vypité pivo &amp; voda na výrobu</h3>
+                            <p class="text-xs text-slate-400 mt-0.5">Porovnání jednotlivých značek ve vaší sbírce (litry piva a litry vody).</p>
+                        </div>
+                        <div class="flex items-center gap-3 text-[11px] font-medium">
+                            <span class="flex items-center gap-1.5 text-amber-300">
+                                <span class="w-2.5 h-2.5 rounded-sm bg-amber-400 inline-block"></span>
+                                Pivo (l)
+                            </span>
+                            <span class="flex items-center gap-1.5 text-sky-300">
+                                <span class="w-2.5 h-2.5 rounded-sm bg-sky-500 inline-block"></span>
+                                Voda (l)
+                            </span>
+                        </div>
+                    </div>
+
+                    <div id="brandsChartContainer" class="space-y-3.5 pt-2"></div>
+                </section>
+            </div>
+        </div>
+    </main>
+
+    <!-- Patička -->
+    <footer class="border-t border-slate-800/80 py-5 text-center text-xs text-slate-500">
+        <div class="max-w-6xl mx-auto px-4">
+            Data se ukládají ve vašem prohlížeči. Pro vystavení své sbírky na webu použijte tlačítko <strong>Záloha / Web → Stáhnout web s mými daty</strong>.
+        </div>
+    </footer>
+
+    <!-- MODÁLNÍ OKNO: Přidání / Úprava víčka -->
+    <div id="capModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
+        <div class="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-md overflow-hidden shadow-2xl transform transition-all max-h-[92vh] overflow-y-auto">
+            <div class="px-6 py-4 border-b border-slate-800 flex items-center justify-between sticky top-0 bg-slate-900 z-10">
+                <h2 id="modalTitle" class="text-lg font-bold text-white">Přidat nové víčko</h2>
+                <button onclick="closeCapModal()" class="text-slate-400 hover:text-white p-1.5 rounded-lg hover:bg-slate-800 transition">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+
+            <form id="capForm" onsubmit="saveCap(event)" class="p-6 space-y-4">
+                <input type="hidden" id="capId">
+
+                <div>
+                    <label for="capBrand" class="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5">Pivovar / Značka *</label>
+                    <input type="text" id="capBrand" required list="brandSuggestions" oninput="autoMatchBrandPreset(this.value)" placeholder="např. Radegast Ryze Hořká 12" 
+                        class="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-700 rounded-xl text-sm text-white placeholder-slate-500 focus:outline-none focus:border-amber-500 transition">
+                    <datalist id="brandSuggestions">
+                        <option value="Pilsner Urquell">
+                        <option value="Radegast Ryze Hořká 12">
+                        <option value="Velkopopovický Kozel">
+                        <option value="Budějovický Budvar">
+                        <option value="Bernard Sváteční ležák">
+                        <option value="Staropramen">
+                        <option value="Gambrinus">
+                        <option value="Krušovice">
+                        <option value="Svijany">
+                        <option value="Starobrno">
+                        <option value="Pivovar Dalešice 11°">
+                        <option value="Birell Světlý">
+                        <option value="Platan">
+                        <option value="Zubr">
+                        <option value="Holba">
+                        <option value="Litovel">
+                        <option value="Primátor">
+                        <option value="Chodovar">
+                        <option value="Heineken">
+                        <option value="Corona Extra">
+                        <option value="Guinness">
+                    </datalist>
+                </div>
+
+                <div>
+                    <div class="flex items-center justify-between mb-1.5">
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-300">Vzory víček podle značky (kliknutím vyberte)</label>
+                        <button type="button" onclick="clearBrandPreset()" class="text-[11px] text-slate-400 hover:text-amber-400 transition">Jen barva</button>
+                    </div>
+                    <div id="brandDesignGallery" class="flex gap-2 overflow-x-auto pb-2 pt-1"></div>
+                    <input type="hidden" id="capDesignKey" value="">
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label for="capType" class="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5">Typ piva</label>
+                        <select id="capType" class="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-700 rounded-xl text-sm text-white focus:outline-none focus:border-amber-500 transition">
+                            <option value="Světlý ležák">Světlý ležák</option>
+                            <option value="Výčepní">Výčepní (10°)</option>
+                            <option value="Polotmavé">Polotmavé</option>
+                            <option value="Tmavé">Tmavé</option>
+                            <option value="Speciál / IPA / APA">Speciál / IPA / APA</option>
+                            <option value="Nealko / Radler">Nealko / Radler</option>
+                            <option value="Jiné">Jiné</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label for="capCount" class="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5">Počet kusů</label>
+                        <input type="number" id="capCount" min="0" max="99999" value="1" required
+                            class="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-700 rounded-xl text-sm text-white focus:outline-none focus:border-amber-500 transition">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-2">Barva víčka (vizuální ikona)</label>
+                    <div id="colorPalette" class="grid grid-cols-6 gap-2.5"></div>
+                    <input type="hidden" id="capColor" value="#f59e0b">
+                </div>
+
+                <div>
+                    <label for="capOrigin" class="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5">Region / Země původu</label>
+                    <input type="text" id="capOrigin" list="originSuggestions" placeholder="např. Morava, Plzeňsko, Bavorsko, Belgie..." 
+                        class="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-700 rounded-xl text-sm text-white placeholder-slate-500 focus:outline-none focus:border-amber-500 transition">
+                    <datalist id="originSuggestions">
+                        <option value="Česko – Morava">
+                        <option value="Česko – Čechy">
+                        <option value="Česko – Slezsko">
+                        <option value="Slovensko">
+                        <option value="Německo / Bavorsko">
+                        <option value="Belgie">
+                        <option value="Polsko">
+                        <option value="Rakousko">
+                    </datalist>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5">Fotka skutečného víčka (volitelné)</label>
+                    <div class="flex items-center gap-3">
+                        <div id="capPhotoPreviewBox" class="w-12 h-12 rounded-full bg-slate-950 border border-slate-700 flex items-center justify-center overflow-hidden shrink-0">
+                            <svg class="w-5 h-5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/>
+                            </svg>
+                        </div>
+                        <div class="flex-1 flex flex-wrap items-center gap-2">
+                            <label class="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-semibold cursor-pointer transition">
+                                Vybrat / vyfotit víčko
+                                <input type="file" id="capPhotoInput" accept="image/*" capture="environment" onchange="handleCapPhotoUpload(event)" class="hidden">
+                            </label>
+                            <button type="button" id="removeCapPhotoBtn" onclick="clearCapPhoto()" class="hidden px-2.5 py-2 rounded-xl bg-rose-950/60 hover:bg-rose-900 text-rose-300 text-xs font-semibold transition">
+                                Odstranit fotku
+                            </button>
+                        </div>
+                    </div>
+                    <input type="hidden" id="capPhotoData">
+                </div>
+
+                <div>
+                    <label for="capNote" class="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5">Poznámka (volitelné)</label>
+                    <input type="text" id="capNote" placeholder="např. Limitovaná edice, z dovolené, zlatý okraj..." 
+                        class="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-700 rounded-xl text-sm text-white placeholder-slate-500 focus:outline-none focus:border-amber-500 transition">
+                </div>
+
+                <div class="pt-3 flex items-center justify-end gap-3 border-t border-slate-800">
+                    <button type="button" onclick="closeCapModal()" class="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-sm font-medium transition">
+                        Zrušit
+                    </button>
+                    <button type="submit" class="px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 text-sm font-bold shadow-lg shadow-amber-500/20 transition">
+                        Uložit víčko
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODÁLNÍ OKNO: Záloha, Publikování na web a Správa dat -->
+    <div id="backupModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
+        <div class="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-md overflow-hidden shadow-2xl max-h-[92vh] overflow-y-auto">
+            <div class="px-6 py-4 border-b border-slate-800 flex items-center justify-between sticky top-0 bg-slate-900 z-10">
+                <h2 class="text-lg font-bold text-white">Záloha &amp; Publikování na web</h2>
+                <button onclick="closeBackupModal()" class="text-slate-400 hover:text-white p-1.5 rounded-lg hover:bg-slate-800 transition">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+
+            <div class="p-6 space-y-4">
+                <!-- Publikování na web se zabudovanými daty -->
+                <div class="bg-gradient-to-br from-amber-500/15 to-amber-600/5 border border-amber-500/40 rounded-xl p-4">
+                    <div class="flex items-center gap-2 mb-1">
+                        <span class="px-2 py-0.5 rounded bg-amber-500 text-slate-950 text-[10px] font-extrabold uppercase">Pro internet</span>
+                        <h3 class="text-sm font-bold text-white">Stáhnout web s mými daty (index.html)</h3>
+                    </div>
+                    <p class="text-xs text-slate-300 mb-3 leading-relaxed">
+                        Zabuduje vaši aktuální sbírku (všechny značky, počty i fotky) přímo do souboru <code class="text-amber-300 font-semibold">index.html</code>. Když tento soubor nahrajete na internet (např. na <strong>Tiiny.host</strong> nebo <strong>GitHub Pages</strong>), každý návštěvník okamžitě uvidí vaše skutečná data bez přihlašování.
+                    </p>
+                    <button onclick="exportPublishedHtml()" class="w-full py-2.5 px-4 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-sm flex items-center justify-center gap-2 shadow-lg shadow-amber-500/20 transition">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                        </svg>
+                        Stáhnout hotový index.html pro web
+                    </button>
+                </div>
+
+                <!-- Export JSON -->
+                <div class="bg-slate-950 border border-slate-800 rounded-xl p-4">
+                    <h3 class="text-sm font-bold text-white mb-1">Záloha dat (JSON)</h3>
+                    <p class="text-xs text-slate-400 mb-3">Stáhněte si čistou datovou zálohu sbírky do souboru.</p>
+                    <button onclick="exportData()" class="w-full py-2.5 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-amber-400 border border-slate-700 font-semibold text-sm flex items-center justify-center gap-2 transition">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                        </svg>
+                        Stáhnout zálohu (.json)
+                    </button>
+                </div>
+
+                <!-- Import JSON -->
+                <div class="bg-slate-950 border border-slate-800 rounded-xl p-4">
+                    <h3 class="text-sm font-bold text-white mb-1">Importovat ze zálohy</h3>
+                    <p class="text-xs text-slate-400 mb-3">Nahrajte dříve uložený soubor <code class="text-slate-300">.json</code>.</p>
+                    <label class="w-full py-2.5 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-semibold text-sm flex items-center justify-center gap-2 transition cursor-pointer">
+                        <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/>
+                        </svg>
+                        Vybrat soubor ze zařízení
+                        <input type="file" id="importFileInput" accept=".json" onchange="importData(event)" class="hidden">
+                    </label>
+                </div>
+
+                <!-- Ukázková data / Smazání vše -->
+                <div class="pt-2 border-t border-slate-800 flex flex-col sm:flex-row gap-2.5">
+                    <button onclick="resetToSampleData()" class="flex-1 py-2.5 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold transition">
+                        Obnovit ukázková data
+                    </button>
+                    <button onclick="confirmClearAll()" class="flex-1 py-2.5 px-3 rounded-xl bg-rose-950/60 hover:bg-rose-900/80 text-rose-300 border border-rose-800/60 text-xs font-semibold transition">
+                        Smazat celou sbírku
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODÁLNÍ OKNO: Vlastní potvrzení akce -->
+    <div id="confirmModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
+        <div class="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-sm p-6 shadow-2xl text-center">
+            <div class="w-12 h-12 rounded-full bg-rose-500/10 border border-rose-500/20 text-rose-400 flex items-center justify-center mx-auto mb-4">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                </svg>
+            </div>
+            <h3 id="confirmTitle" class="text-lg font-bold text-white mb-2">Opravdu smazat?</h3>
+            <p id="confirmMessage" class="text-sm text-slate-400 mb-6">Tuto akci nelze vrátit zpět.</p>
+            <div class="flex gap-3">
+                <button onclick="closeConfirmModal()" class="flex-1 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-sm font-medium transition">
+                    Zrušit
+                </button>
+                <button id="confirmActionBtn" class="flex-1 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white text-sm font-bold transition">
+                    Ano, smazat
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOAST NOTIFIKACE -->
+    <div id="toastContainer" class="fixed bottom-4 right-4 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+    <!-- VESTAVĚNÁ DATA SBÍRKY PRO VEŘEJNÝ WEB (automaticky se aktualizují při stažení index.html) -->
+    <script id="embedded-collection-data" type="application/json">null</script>
+
+    <script>
+        /**
+         * Vestavěné ilustrované motivy korunkových víček pro známé značky
+         */
+        const BRAND_CAP_DESIGNS = {
+            pilsner: {
+                key: 'pilsner',
+                label: 'Pilsner Urquell',
+                keywords: ['pilsner', 'urquell', 'plzeň', 'prazdroj'],
+                baseHex: '#15803d',
+                rimHex: '#f59e0b',
+                accentHex: '#fef3c7',
+                textHex: '#ffffff',
+                topArc: 'PILSNER',
+                centerText: 'PU',
+                bottomArc: '1842',
+                origin: 'Česko – Čechy',
+                type: 'Světlý ležák',
+                badge: 'crown'
+            },
+            radegast: {
+                key: 'radegast',
+                label: 'Radegast',
+                keywords: ['radegast', 'nošovice', 'ryze hořká'],
+                baseHex: '#111827',
+                rimHex: '#d97706',
+                accentHex: '#f59e0b',
+                textHex: '#fbbf24',
+                topArc: 'RADEGAST',
+                centerText: 'R',
+                bottomArc: 'HOŘKÁ',
+                origin: 'Česko – Morava',
+                type: 'Světlý ležák',
+                badge: 'horns'
+            },
+            kozel: {
+                key: 'kozel',
+                label: 'Velkopopovický Kozel',
+                keywords: ['kozel', 'velkopopovický', 'popovice'],
+                baseHex: '#92400e',
+                rimHex: '#fef3c7',
+                accentHex: '#f59e0b',
+                textHex: '#fef3c7',
+                topArc: 'KOZEL',
+                centerText: 'K',
+                bottomArc: '1874',
+                origin: 'Česko – Čechy',
+                type: 'Výčepní',
+                badge: 'shield'
+            },
+            budvar: {
+                key: 'budvar',
+                label: 'Budějovický Budvar',
+                keywords: ['budvar', 'budějovický', 'budweiser'],
+                baseHex: '#b91c1c',
+                rimHex: '#fbbf24',
+                accentHex: '#ffffff',
+                textHex: '#ffffff',
+                topArc: 'BUDVAR',
+                centerText: 'B',
+                bottomArc: 'ČESKÉ BUDĚJOVICE',
+                origin: 'Česko – Čechy',
+                type: 'Světlý ležák',
+                badge: 'crown'
+            },
+            bernard: {
+                key: 'bernard',
+                label: 'Bernard',
+                keywords: ['bernard', 'humpolec'],
+                baseHex: '#dc2626',
+                rimHex: '#f8fafc',
+                accentHex: '#fef2f2',
+                textHex: '#ffffff',
+                topArc: 'BERNARD',
+                centerText: 'RB',
+                bottomArc: '1597',
+                origin: 'Česko – Vysočina',
+                type: 'Speciál / IPA / APA',
+                badge: 'ring'
+            },
+            staropramen: {
+                key: 'staropramen',
+                label: 'Staropramen',
+                keywords: ['staropramen', 'smíchov'],
+                baseHex: '#047857',
+                rimHex: '#e2e8f0',
+                accentHex: '#fbbf24',
+                textHex: '#ffffff',
+                topArc: 'STAROPRAMEN',
+                centerText: 'S',
+                bottomArc: 'PRAHA',
+                origin: 'Česko – Čechy',
+                type: 'Světlý ležák',
+                badge: 'ring'
+            },
+            gambrinus: {
+                key: 'gambrinus',
+                label: 'Gambrinus',
+                keywords: ['gambrinus', 'géčko'],
+                baseHex: '#d97706',
+                rimHex: '#1e293b',
+                accentHex: '#fef3c7',
+                textHex: '#0f172a',
+                topArc: 'GAMBRINUS',
+                centerText: 'G',
+                bottomArc: '1869',
+                origin: 'Česko – Čechy',
+                type: 'Výčepní',
+                badge: 'crown'
+            },
+            krusovice: {
+                key: 'krusovice',
+                label: 'Krušovice',
+                keywords: ['krušovice', 'královský'],
+                baseHex: '#1e293b',
+                rimHex: '#eab308',
+                accentHex: '#dc2626',
+                textHex: '#fde047',
+                topArc: 'KRUŠOVICE',
+                centerText: 'KR',
+                bottomArc: '1581',
+                origin: 'Česko – Čechy',
+                type: 'Světlý ležák',
+                badge: 'crown'
+            },
+            svijany: {
+                key: 'svijany',
+                label: 'Svijany',
+                keywords: ['svijany', 'svijanský', 'máz'],
+                baseHex: '#1d4ed8',
+                rimHex: '#f8fafc',
+                accentHex: '#93c5fd',
+                textHex: '#ffffff',
+                topArc: 'SVIJANY',
+                centerText: 'SV',
+                bottomArc: '1564',
+                origin: 'Česko – Čechy',
+                type: 'Světlý ležák',
+                badge: 'shield'
+            },
+            starobrno: {
+                key: 'starobrno',
+                label: 'Starobrno',
+                keywords: ['starobrno', 'brno', 'medium', 'bitr'],
+                baseHex: '#991b1b',
+                rimHex: '#fde047',
+                accentHex: '#ffffff',
+                textHex: '#fde047',
+                topArc: 'STAROBRNO',
+                centerText: 'SB',
+                bottomArc: 'BRNO',
+                origin: 'Česko – Morava',
+                type: 'Světlý ležák',
+                badge: 'shield'
+            },
+            dalesice: {
+                key: 'dalesice',
+                label: 'Pivovar Dalešice',
+                keywords: ['dalešice', 'postřižin'],
+                baseHex: '#f59e0b',
+                rimHex: '#78350f',
+                accentHex: '#451a03',
+                textHex: '#451a03',
+                topArc: 'DALEŠICE',
+                centerText: 'PD',
+                bottomArc: 'PIVO',
+                origin: 'Česko – Morava',
+                type: 'Světlý ležák',
+                badge: 'ring'
+            },
+            birell: {
+                key: 'birell',
+                label: 'Birell',
+                keywords: ['birell', 'nealko'],
+                baseHex: '#2563eb',
+                rimHex: '#38bdf8',
+                accentHex: '#ffffff',
+                textHex: '#ffffff',
+                topArc: 'BIRELL',
+                centerText: 'B',
+                bottomArc: '0.0%',
+                origin: 'Česko – Morava',
+                type: 'Nealko / Radler',
+                badge: 'ring'
+            },
+            zubr: {
+                key: 'zubr',
+                label: 'Zubr',
+                keywords: ['zubr', 'přerov', 'grand'],
+                baseHex: '#b45309',
+                rimHex: '#fef08a',
+                accentHex: '#1c1917',
+                textHex: '#fef9c3',
+                topArc: 'ZUBR',
+                centerText: 'Z',
+                bottomArc: '1872',
+                origin: 'Česko – Morava',
+                type: 'Světlý ležák',
+                badge: 'horns'
+            },
+            holba: {
+                key: 'holba',
+                label: 'Holba',
+                keywords: ['holba', 'hanušovice', 'šerák'],
+                baseHex: '#166534',
+                rimHex: '#e2e8f0',
+                accentHex: '#86efac',
+                textHex: '#ffffff',
+                topArc: 'HOLBA',
+                centerText: 'H',
+                bottomArc: 'ŠERÁK',
+                origin: 'Česko – Morava',
+                type: 'Světlý ležák',
+                badge: 'shield'
+            },
+            heineken: {
+                key: 'heineken',
+                label: 'Heineken',
+                keywords: ['heineken'],
+                baseHex: '#16a34a',
+                rimHex: '#ffffff',
+                accentHex: '#ef4444',
+                textHex: '#ffffff',
+                topArc: 'HEINEKEN',
+                centerText: '★',
+                bottomArc: 'LAGER',
+                origin: 'Nizozemsko',
+                type: 'Světlý ležák',
+                badge: 'star'
+            },
+            corona: {
+                key: 'corona',
+                label: 'Corona Extra',
+                keywords: ['corona'],
+                baseHex: '#f8fafc',
+                rimHex: '#1e3a8a',
+                accentHex: '#eab308',
+                textHex: '#1e3a8a',
+                topArc: 'CORONA',
+                centerText: 'CE',
+                bottomArc: 'EXTRA',
+                origin: 'Mexiko',
+                type: 'Světlý ležák',
+                badge: 'crown'
+            },
+            guinness: {
+                key: 'guinness',
+                label: 'Guinness',
+                keywords: ['guinness', 'stout'],
+                baseHex: '#090d16',
+                rimHex: '#d97706',
+                accentHex: '#fbbf24',
+                textHex: '#fbbf24',
+                topArc: 'GUINNESS',
+                centerText: '1759',
+                bottomArc: 'STOUT',
+                origin: 'Irsko',
+                type: 'Tmavé',
+                badge: 'crown'
+            }
+        };
+
+        /**
+         * Ukázková data (použijí se jen tehdy, pokud v souboru nejsou zabudovaná vaše data ani uložená data v prohlížeči)
+         */
+        const SAMPLE_CAPS = [
+            {
+                id: 'sample-1',
+                brand: 'Radegast Ryze Hořká 12',
+                type: 'Světlý ležák',
+                color: '#111827',
+                designKey: 'radegast',
+                origin: 'Česko – Morava',
+                count: 14,
+                note: 'Černé víčko se zlatým lemem',
+                createdAt: Date.now() - 400000
+            },
+            {
+                id: 'sample-2',
+                brand: 'Pilsner Urquell',
+                type: 'Světlý ležák',
+                color: '#15803d',
+                designKey: 'pilsner',
+                origin: 'Česko – Čechy',
+                count: 23,
+                note: 'Klasická zelená korunka',
+                createdAt: Date.now() - 300000
+            },
+            {
+                id: 'sample-3',
+                brand: 'Bernard Sváteční ležák',
+                type: 'Speciál / IPA / APA',
+                color: '#dc2626',
+                designKey: 'bernard',
+                origin: 'Česko – Vysočina',
+                count: 7,
+                note: 'Červené víčko s bílým logem',
+                createdAt: Date.now() - 200000
+            },
+            {
+                id: 'sample-4',
+                brand: 'Velkopopovický Kozel',
+                type: 'Výčepní',
+                color: '#92400e',
+                designKey: 'kozel',
+                origin: 'Česko – Čechy',
+                count: 11,
+                note: 'Hnědá korunka s erbem',
+                createdAt: Date.now() - 150000
+            },
+            {
+                id: 'sample-5',
+                brand: 'Pivovar Dalešice 11°',
+                type: 'Světlý ležák',
+                color: '#f59e0b',
+                designKey: 'dalesice',
+                origin: 'Česko – Morava',
+                count: 5,
+                note: 'Zlaté víčko – Postřižinské pivo',
+                createdAt: Date.now() - 100000
+            },
+            {
+                id: 'sample-6',
+                brand: 'Birell Světlý',
+                type: 'Nealko / Radler',
+                color: '#2563eb',
+                designKey: 'birell',
+                origin: 'Česko – Morava',
+                count: 9,
+                note: 'Modré nealko víčko',
+                createdAt: Date.now() - 50000
+            }
+        ];
+
+        const STORAGE_KEY = 'pivni_vicka_collection_v1';
+        const INIT_FLAG_KEY = 'pivni_vicka_initialized_v1';
+
+        const CAP_COLORS = [
+            { name: 'Zlatá / Jantarová', hex: '#f59e0b', text: '#0f172a' },
+            { name: 'Pilsner Zelená', hex: '#15803d', text: '#ffffff' },
+            { name: 'Černá (Radegast)', hex: '#111827', text: '#ffffff' },
+            { name: 'Červená (Budvar)', hex: '#dc2626', text: '#ffffff' },
+            { name: 'Královská Modrá', hex: '#2563eb', text: '#ffffff' },
+            { name: 'Stříbrná / Bílá', hex: '#e2e8f0', text: '#0f172a' },
+            { name: 'Hnědá (Kozel)', hex: '#92400e', text: '#ffffff' },
+            { name: 'Smaragdová', hex: '#047857', text: '#ffffff' },
+            { name: 'Fialová', hex: '#7c3aed', text: '#ffffff' },
+            { name: 'Růžová / Rubínová', hex: '#be185d', text: '#ffffff' },
+            { name: 'Tmavě modrá', hex: '#1e3a8a', text: '#ffffff' },
+            { name: 'Měděná / Bronzová', hex: '#b45309', text: '#ffffff' }
+        ];
+
+        let caps = [];
+        let confirmCallback = null;
+
+        const CAP_DIAMETER_CM = 3.0;
+        const plannerState = {
+            widthCm: 60,
+            heightCm: 40,
+            layout: 'grid',
+            gapMm: 0,
+            borderCm: 2,
+            previewMode: 'collection',
+            selectedBrushColor: '#f59e0b',
+            selectedBrushName: 'Zlatá / Jantarová',
+            customCells: {},
+            calculatedCells: [],
+            gridCells: [],
+            isDrawing: false
+        };
+
+        let bottleVolumeLiters = 0.5;
+
+        window.addEventListener('DOMContentLoaded', () => {
+            initColorPalette();
+            initBrandDesignGallery();
+            loadData();
+            setupEventListeners();
+            initPlannerControls();
+            renderAll();
+        });
+
+        /**
+         * Načtení vestavěných dat (pokud byla vyexportována pro web)
+         */
+        function getEmbeddedCapsData() {
+            try {
+                const scriptEl = document.getElementById('embedded-collection-data');
+                if (!scriptEl) return null;
+                const parsed = JSON.parse(scriptEl.textContent.trim());
+                return Array.isArray(parsed) ? parsed : null;
+            } catch (e) {
+                return null;
+            }
+        }
+
+        /**
+         * Načtení a uložení dat:
+         * 1. Pokud jsou v HTML zabudovaná data pro veřejný web, použijí se jako výchozí pro každého návštěvníka.
+         * 2. Pokud uživatel v prohlížeči udělal vlastní úpravy, načtou se z localStorage.
+         */
+        function loadData() {
+            const embeddedCaps = getEmbeddedCapsData();
+            try {
+                const raw = localStorage.getItem(STORAGE_KEY);
+                const initialized = localStorage.getItem(INIT_FLAG_KEY);
+
+                if (raw) {
+                    const parsed = JSON.parse(raw);
+                    caps = Array.isArray(parsed) ? parsed : [];
+                } else if (embeddedCaps) {
+                    caps = [...embeddedCaps];
+                } else if (!initialized) {
+                    caps = [...SAMPLE_CAPS];
+                    localStorage.setItem(INIT_FLAG_KEY, '1');
+                    saveData();
+                } else {
+                    caps = [];
+                }
+            } catch (e) {
+                console.error('Chyba při načítání dat:', e);
+                caps = embeddedCaps ? [...embeddedCaps] : [...SAMPLE_CAPS];
+            }
+        }
+
+        function saveData() {
+            try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(caps));
+                localStorage.setItem(INIT_FLAG_KEY, '1');
+            } catch (e) {
+                console.error('Chyba při ukládání dat:', e);
+                showToast('Nepodařilo se uložit data do prohlížeče (možná je plná paměť).', 'error');
+            }
+        }
+
+        /**
+         * Vygeneruje a stáhne kompletní soubor index.html se zabudovanými aktuálními daty sbírky.
+         * Po nahrání na web (Tiiny.host / GitHub Pages) uvidí každý návštěvník ihned tato data bez přihlášení.
+         */
+        function exportPublishedHtml() {
+            try {
+                const fullHtml = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+                const safeJson = JSON.stringify(caps).replace(/<\/script/gi, '<\\/script');
+                const updatedHtml = fullHtml.replace(
+                    /<script id="embedded-collection-data" type="application\/json">[\s\S]*?<\/script>/,
+                    `<script id="embedded-collection-data" type="application/json">${safeJson}<\/script>`
+                );
+
+                const blob = new Blob([updatedHtml], { type: 'text/html;charset=utf-8' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'index.html';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+
+                showToast('Soubor index.html s vašimi daty byl stažen! Stačí ho nahrát na web.');
+            } catch (err) {
+                console.error(err);
+                showToast('Nepodařilo se vygenerovat soubor pro web.', 'error');
+            }
+        }
+
+        function switchView(viewName) {
+            const views = {
+                collection: document.getElementById('viewCollection'),
+                planner: document.getElementById('viewPlanner'),
+                stats: document.getElementById('viewStats')
+            };
+            const buttons = {
+                collection: document.getElementById('tabBtnCollection'),
+                planner: document.getElementById('tabBtnPlanner'),
+                stats: document.getElementById('tabBtnStats')
+            };
+
+            const activeClass = 'flex-1 sm:flex-none px-4 py-2 rounded-lg text-sm font-bold bg-amber-500 text-slate-950 shadow transition flex items-center justify-center gap-2';
+            const inactiveClass = 'flex-1 sm:flex-none px-4 py-2 rounded-lg text-sm font-semibold text-slate-300 hover:text-white transition flex items-center justify-center gap-2';
+
+            Object.keys(views).forEach(key => {
+                if (views[key]) {
+                    views[key].classList.toggle('hidden', key !== viewName);
+                }
+                if (buttons[key]) {
+                    buttons[key].className = key === viewName ? activeClass : inactiveClass;
+                }
+            });
+
+            if (viewName === 'planner') {
+                updatePlanner();
+            } else if (viewName === 'stats') {
+                renderConsumptionStats();
+            }
+        }
+
+        function setupEventListeners() {
+            const searchInput = document.getElementById('searchInput');
+            const clearBtn = document.getElementById('clearSearchBtn');
+            if (searchInput) {
+                searchInput.addEventListener('input', () => {
+                    if (clearBtn) {
+                        clearBtn.classList.toggle('hidden', !searchInput.value.trim());
+                    }
+                    renderGrid();
+                });
+            }
+
+            const typeFilter = document.getElementById('typeFilter');
+            if (typeFilter) typeFilter.addEventListener('change', renderGrid);
+
+            const originFilter = document.getElementById('originFilter');
+            if (originFilter) originFilter.addEventListener('change', renderGrid);
+
+            const sortSelect = document.getElementById('sortSelect');
+            if (sortSelect) sortSelect.addEventListener('change', renderGrid);
+
+            const confirmActionBtn = document.getElementById('confirmActionBtn');
+            if (confirmActionBtn) {
+                confirmActionBtn.addEventListener('click', () => {
+                    if (typeof confirmCallback === 'function') {
+                        confirmCallback();
+                    }
+                    closeConfirmModal();
+                });
+            }
+
+            ['capModal', 'backupModal', 'confirmModal'].forEach(modalId => {
+                const modal = document.getElementById(modalId);
+                if (modal) {
+                    modal.addEventListener('click', (e) => {
+                        if (e.target === modal) {
+                            modal.classList.add('hidden');
+                            modal.classList.remove('flex');
+                        }
+                    });
+                }
+            });
+
+            window.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    closeCapModal();
+                    closeBackupModal();
+                    closeConfirmModal();
+                }
+            });
+        }
+
+        function renderAll() {
+            updateStats();
+            updateOriginFilterOptions();
+            renderGrid();
+            if (!document.getElementById('viewPlanner').classList.contains('hidden')) {
+                updatePlanner();
+            }
+            if (!document.getElementById('viewStats').classList.contains('hidden')) {
+                renderConsumptionStats();
+            }
+        }
+
+        function updateStats() {
+            const totalCaps = caps.reduce((sum, item) => sum + (Number(item.count) || 0), 0);
+            const activeBrands = caps.filter(item => (Number(item.count) || 0) > 0);
+            const uniqueCount = activeBrands.length;
+
+            document.getElementById('statTotalCaps').textContent = totalCaps.toLocaleString('cs-CZ');
+            document.getElementById('statUniqueBrands').textContent = uniqueCount.toLocaleString('cs-CZ');
+
+            const topBrandEl = document.getElementById('statTopBrand');
+            const topBrandCountEl = document.getElementById('statTopBrandCount');
+
+            if (activeBrands.length === 0) {
+                topBrandEl.textContent = '—';
+                topBrandCountEl.textContent = '';
+            } else {
+                const top = [...activeBrands].sort((a, b) => b.count - a.count)[0];
+                topBrandEl.textContent = top.brand;
+                topBrandCountEl.textContent = `${top.count} ks ve sbírce`;
+            }
+        }
+
+        function updateOriginFilterOptions() {
+            const select = document.getElementById('originFilter');
+            if (!select) return;
+            const currentVal = select.value;
+            const origins = [...new Set(caps.map(c => (c.origin || '').trim()).filter(Boolean))].sort((a, b) => a.localeCompare(b, 'cs'));
+
+            select.innerHTML = `<option value="all">Všechny regiony / země</option>` +
+                origins.map(o => `<option value="${escapeHtml(o)}">${escapeHtml(o)}</option>`).join('');
+
+            if (origins.includes(currentVal)) {
+                select.value = currentVal;
+            }
+        }
+
+        function resolveBrandDesign(brandName, explicitKey) {
+            if (explicitKey && BRAND_CAP_DESIGNS[explicitKey]) {
+                return BRAND_CAP_DESIGNS[explicitKey];
+            }
+            if (!brandName) return null;
+            const norm = brandName.toLowerCase();
+            return Object.values(BRAND_CAP_DESIGNS).find(d =>
+                d.keywords.some(kw => norm.includes(kw))
+            ) || null;
+        }
+
+        function createCrownCapSVG(hexColor, brandName, photoUrl, designKey) {
+            if (photoUrl) {
+                return `
+                    <div class="relative w-16 h-16 shrink-0 rounded-full overflow-hidden border-2 border-amber-400/60 shadow-md bg-slate-950 select-none">
+                        <img src="${photoUrl}" alt="${escapeHtml(brandName)}" class="w-full h-full object-cover">
+                    </div>
+                `;
+            }
+
+            const design = resolveBrandDesign(brandName, designKey);
+            const uid = 'cap-' + Math.random().toString(36).substring(2, 8);
+
+            if (design) {
+                const badgeDecor = design.badge === 'crown'
+                    ? `<path d="M39 27 L42 33 L50 26 L58 33 L61 27 L60 35 L40 35 Z" fill="${design.accentHex}" opacity="0.95"/>`
+                    : design.badge === 'horns'
+                    ? `<path d="M36 33 C34 25, 42 23, 44 29 C41 27, 38 29, 39 33 Z M64 33 C66 25, 58 23, 56 29 C59 27, 62 29, 61 33 Z" fill="${design.accentHex}"/>`
+                    : design.badge === 'star'
+                    ? `<polygon points="50,23 52,29 58,29 53,32 55,38 50,34 45,38 47,32 42,29 48,29" fill="${design.accentHex}"/>`
+                    : `<circle cx="50" cy="30" r="2.5" fill="${design.accentHex}"/>`;
+
+                return `
+                    <div class="relative w-16 h-16 shrink-0 flex items-center justify-center select-none drop-shadow-md">
+                        <svg viewBox="0 0 100 100" class="w-full h-full">
+                            <defs>
+                                <radialGradient id="${uid}-grad" cx="35%" cy="30%" r="70%">
+                                    <stop offset="0%" stop-color="#ffffff" stop-opacity="0.28"/>
+                                    <stop offset="55%" stop-color="${design.baseHex}" stop-opacity="0"/>
+                                    <stop offset="100%" stop-color="#000000" stop-opacity="0.35"/>
+                                </radialGradient>
+                            </defs>
+                            <polygon points="
+                                50,2 57,8 66,5 71,13 80,13 82,22 91,25 90,34 97,40 93,49 98,57 91,64 93,73 84,77 83,86 74,87 70,95 61,93 54,99 46,99 39,93 30,95 26,87 17,86 16,77 7,73 9,64 2,57 7,49 3,40 10,34 9,25 18,22 20,13 29,13 34,5 43,8"
+                                fill="${design.rimHex}" stroke="rgba(255,255,255,0.28)" stroke-width="1.5" />
+                            <circle cx="50" cy="50" r="39" fill="${design.baseHex}" />
+                            <circle cx="50" cy="50" r="39" fill="url(#${uid}-grad)" />
+                            <circle cx="50" cy="50" r="34.5" fill="none" stroke="${design.accentHex}" stroke-opacity="0.7" stroke-width="1.5" stroke-dasharray="3 1.5" />
+                            ${badgeDecor}
+                            <text x="50" y="21" text-anchor="middle" fill="${design.textHex}" font-family="Inter, sans-serif" font-weight="800" font-size="6.8" letter-spacing="0.8">
+                                ${escapeHtml(design.topArc)}
+                            </text>
+                            <text x="50" y="58" text-anchor="middle" fill="${design.textHex}" font-family="Inter, sans-serif" font-weight="900" font-size="${design.centerText.length > 2 ? '16' : '21'}" letter-spacing="0.5">
+                                ${escapeHtml(design.centerText)}
+                            </text>
+                            <text x="50" y="76" text-anchor="middle" fill="${design.accentHex}" font-family="Inter, sans-serif" font-weight="700" font-size="6.2" letter-spacing="0.6">
+                                ${escapeHtml(design.bottomArc)}
+                            </text>
+                            <path d="M 24 31 A 30 30 0 0 1 76 31" fill="none" stroke="rgba(255,255,255,0.38)" stroke-width="2.5" stroke-linecap="round" />
+                        </svg>
+                    </div>
+                `;
+            }
+
+            const textColor = isLightColor(hexColor) ? '#0f172a' : '#ffffff';
+            const initials = getInitials(brandName);
+
+            return `
+                <div class="relative w-16 h-16 shrink-0 flex items-center justify-center select-none drop-shadow-md">
+                    <svg viewBox="0 0 100 100" class="w-full h-full">
+                        <polygon points="
+                            50,2 57,8 66,5 71,13 80,13 82,22 91,25 90,34 97,40 93,49 98,57 91,64 93,73 84,77 83,86 74,87 70,95 61,93 54,99 46,99 39,93 30,95 26,87 17,86 16,77 7,73 9,64 2,57 7,49 3,40 10,34 9,25 18,22 20,13 29,13 34,5 43,8"
+                            fill="${hexColor}" stroke="rgba(255,255,255,0.22)" stroke-width="2" />
+                        <circle cx="50" cy="50" r="36" fill="none" stroke="${textColor}" stroke-opacity="0.28" stroke-width="2" />
+                        <path d="M 26 32 A 28 28 0 0 1 74 32" fill="none" stroke="rgba(255,255,255,0.35)" stroke-width="3" stroke-linecap="round" />
+                        <text x="50" y="56" text-anchor="middle" fill="${textColor}" font-family="Inter, sans-serif" font-weight="800" font-size="22" letter-spacing="0.5">
+                            ${escapeHtml(initials)}
+                        </text>
+                    </svg>
+                </div>
+            `;
+        }
+
+        function renderGrid() {
+            const grid = document.getElementById('capsGrid');
+            const emptyState = document.getElementById('emptyState');
+            const searchQuery = document.getElementById('searchInput').value.trim().toLowerCase();
+            const typeFilter = document.getElementById('typeFilter').value;
+            const originFilterEl = document.getElementById('originFilter');
+            const originFilter = originFilterEl ? originFilterEl.value : 'all';
+            const sortBy = document.getElementById('sortSelect').value;
+
+            let filtered = caps.filter(cap => {
+                const matchesSearch = !searchQuery ||
+                    cap.brand.toLowerCase().includes(searchQuery) ||
+                    (cap.note && cap.note.toLowerCase().includes(searchQuery)) ||
+                    (cap.type && cap.type.toLowerCase().includes(searchQuery)) ||
+                    (cap.origin && cap.origin.toLowerCase().includes(searchQuery));
+                const matchesType = typeFilter === 'all' || cap.type === typeFilter;
+                const matchesOrigin = originFilter === 'all' || (cap.origin || '') === originFilter;
+                return matchesSearch && matchesType && matchesOrigin;
+            });
+
+            filtered.sort((a, b) => {
+                if (sortBy === 'count-desc') return b.count - a.count;
+                if (sortBy === 'count-asc') return a.count - b.count;
+                if (sortBy === 'name-asc') return a.brand.localeCompare(b.brand, 'cs');
+                if (sortBy === 'name-desc') return b.brand.localeCompare(a.brand, 'cs');
+                if (sortBy === 'newest') return (b.createdAt || 0) - (a.createdAt || 0);
+                return 0;
+            });
+
+            if (filtered.length === 0) {
+                grid.innerHTML = '';
+                emptyState.classList.remove('hidden');
+
+                const titleEl = document.getElementById('emptyStateTitle');
+                const descEl = document.getElementById('emptyStateDesc');
+                const sampleBtn = document.getElementById('loadSamplesBtn');
+
+                if (caps.length > 0) {
+                    titleEl.textContent = 'Žádná víčka neodpovídají filtru';
+                    descEl.textContent = 'Zkuste upravit hledaný výraz nebo přepnout filtr typu piva.';
+                    sampleBtn.classList.add('hidden');
+                } else {
+                    titleEl.textContent = 'Sbírka je zatím prázdná';
+                    descEl.textContent = 'Začněte přidáním svého prvního pivního víčka nebo nahrajte ukázkovou sbírku.';
+                    sampleBtn.classList.remove('hidden');
+                }
+                return;
+            }
+
+            emptyState.classList.add('hidden');
+
+            grid.innerHTML = filtered.map(cap => `
+                <article class="bg-slate-900 border border-slate-800 hover:border-slate-700 rounded-2xl p-5 flex flex-col justify-between gap-4 shadow-sm transition group">
+                    <div class="flex items-start justify-between gap-3">
+                        <div class="flex items-center gap-3.5 min-w-0">
+                            ${createCrownCapSVG(cap.color || '#f59e0b', cap.brand, cap.photo, cap.designKey)}
+                            <div class="min-w-0">
+                                <div class="flex flex-wrap items-center gap-1.5 mb-1">
+                                    <span class="inline-block px-2 py-0.5 rounded-md bg-slate-800 text-slate-300 text-[11px] font-medium">
+                                        ${escapeHtml(cap.type || 'Pivo')}
+                                    </span>
+                                    ${cap.origin ? `<span class="inline-block px-2 py-0.5 rounded-md bg-emerald-500/10 text-emerald-300 border border-emerald-500/20 text-[11px] font-medium truncate max-w-[140px]">${escapeHtml(cap.origin)}</span>` : ''}
+                                </div>
+                                <h3 class="text-base font-bold text-white leading-snug truncate" title="${escapeHtml(cap.brand)}">
+                                    ${escapeHtml(cap.brand)}
+                                </h3>
+                                ${cap.note ? `<p class="text-xs text-slate-400 truncate mt-0.5" title="${escapeHtml(cap.note)}">${escapeHtml(cap.note)}</p>` : ''}
+                            </div>
+                        </div>
+
+                        <div class="flex items-center gap-1 shrink-0">
+                            <button onclick="openCapModal('${cap.id}')" class="p-2 rounded-lg text-slate-400 hover:text-amber-400 hover:bg-slate-800 transition" title="Upravit víčko">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
+                                </svg>
+                            </button>
+                            <button onclick="askDeleteCap('${cap.id}')" class="p-2 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-slate-800 transition" title="Odstranit ze sbírky">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="pt-3 border-t border-slate-800/80 flex items-center justify-between gap-3">
+                        <span class="text-xs font-medium text-slate-400">Počet kusů:</span>
+                        <div class="flex items-center gap-2">
+                            <button onclick="changeCapCount('${cap.id}', -1)" 
+                                class="w-10 h-10 rounded-xl bg-slate-800 hover:bg-slate-700 active:scale-95 text-slate-200 font-bold text-lg flex items-center justify-center border border-slate-700 transition select-none"
+                                aria-label="Odebrat 1 kus">
+                                −
+                            </button>
+                            <span id="count-val-${cap.id}" class="min-w-[3.25rem] text-center text-xl font-extrabold text-white tabular-nums">
+                                ${cap.count}
+                            </span>
+                            <button onclick="changeCapCount('${cap.id}', 1)" 
+                                class="w-10 h-10 rounded-xl bg-amber-500 hover:bg-amber-400 active:scale-95 text-slate-950 font-extrabold text-lg flex items-center justify-center shadow-md shadow-amber-500/10 transition select-none"
+                                aria-label="Přidat 1 kus">
+                                +
+                            </button>
+                        </div>
+                    </div>
+                </article>
+            `).join('');
+        }
+
+        function changeCapCount(id, delta) {
+            const index = caps.findIndex(c => c.id === id);
+            if (index === -1) return;
+
+            const nextCount = Math.max(0, (Number(caps[index].count) || 0) + delta);
+            caps[index].count = nextCount;
+            saveData();
+            updateStats();
+
+            const countEl = document.getElementById(`count-val-${id}`);
+            if (countEl) {
+                countEl.textContent = nextCount;
+                countEl.classList.remove('animate-pop');
+                void countEl.offsetWidth;
+                countEl.classList.add('animate-pop');
+            } else {
+                renderGrid();
+            }
+
+            if (!document.getElementById('viewPlanner').classList.contains('hidden')) {
+                updatePlanner();
+            }
+            if (!document.getElementById('viewStats').classList.contains('hidden')) {
+                renderConsumptionStats();
+            }
+        }
+
+        function initColorPalette() {
+            const paletteEl = document.getElementById('colorPalette');
+            paletteEl.innerHTML = CAP_COLORS.map(c => `
+                <button type="button" data-hex="${c.hex}" onclick="selectCapColor('${c.hex}')"
+                    title="${c.name}"
+                    class="color-swatch w-full aspect-square rounded-xl border-2 border-transparent transition transform hover:scale-105 focus:outline-none flex items-center justify-center"
+                    style="background-color: ${c.hex};">
+                    <svg class="w-4 h-4 hidden check-icon" style="color: ${c.text};" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
+                    </svg>
+                </button>
+            `).join('');
+        }
+
+        function selectCapColor(hex) {
+            document.getElementById('capColor').value = hex;
+            document.querySelectorAll('.color-swatch').forEach(btn => {
+                const check = btn.querySelector('.check-icon');
+                if (btn.dataset.hex.toLowerCase() === hex.toLowerCase()) {
+                    btn.classList.add('ring-2', 'ring-white', 'scale-105');
+                    check.classList.remove('hidden');
+                } else {
+                    btn.classList.remove('ring-2', 'ring-white', 'scale-105');
+                    check.classList.add('hidden');
+                }
+            });
+        }
+
+        function initBrandDesignGallery() {
+            const gallery = document.getElementById('brandDesignGallery');
+            if (!gallery) return;
+
+            gallery.innerHTML = Object.values(BRAND_CAP_DESIGNS).map(d => `
+                <button type="button" data-design-key="${d.key}" onclick="selectBrandPreset('${d.key}')"
+                    title="${escapeHtml(d.label)}"
+                    class="brand-design-btn shrink-0 flex flex-col items-center gap-1 p-1.5 rounded-xl bg-slate-950 border border-slate-800 hover:border-amber-500/60 transition">
+                    <div class="w-11 h-11 rounded-full flex items-center justify-center font-extrabold text-xs border-2 shadow"
+                        style="background-color: ${d.baseHex}; border-color: ${d.rimHex}; color: ${d.textHex};">
+                        ${escapeHtml(d.centerText)}
+                    </div>
+                    <span class="text-[10px] text-slate-300 max-w-[60px] truncate">${escapeHtml(d.label.split(' ')[0])}</span>
+                </button>
+            `).join('');
+        }
+
+        function highlightSelectedDesign(key) {
+            document.querySelectorAll('.brand-design-btn').forEach(btn => {
+                if (btn.dataset.designKey === key) {
+                    btn.classList.add('border-amber-500', 'bg-amber-500/10');
+                    btn.classList.remove('border-slate-800');
+                } else {
+                    btn.classList.remove('border-amber-500', 'bg-amber-500/10');
+                    btn.classList.add('border-slate-800');
+                }
+            });
+        }
+
+        function selectBrandPreset(key) {
+            const design = BRAND_CAP_DESIGNS[key];
+            if (!design) return;
+
+            document.getElementById('capDesignKey').value = key;
+            highlightSelectedDesign(key);
+            selectCapColor(design.baseHex);
+
+            const brandInput = document.getElementById('capBrand');
+            if (!brandInput.value.trim()) {
+                brandInput.value = design.label;
+            }
+            const originInput = document.getElementById('capOrigin');
+            if (!originInput.value.trim() && design.origin) {
+                originInput.value = design.origin;
+            }
+            if (design.type) {
+                document.getElementById('capType').value = design.type;
+            }
+        }
+
+        function clearBrandPreset() {
+            document.getElementById('capDesignKey').value = '';
+            highlightSelectedDesign('');
+        }
+
+        function autoMatchBrandPreset(brandText) {
+            const matched = resolveBrandDesign(brandText, '');
+            if (matched) {
+                document.getElementById('capDesignKey').value = matched.key;
+                highlightSelectedDesign(matched.key);
+                selectCapColor(matched.baseHex);
+            }
+        }
+
+        function setBottleVolume(liters) {
+            bottleVolumeLiters = liters;
+            const btn05 = document.getElementById('volBtn05');
+            const btn033 = document.getElementById('volBtn033');
+
+            if (liters === 0.5) {
+                btn05.className = 'px-3 py-1.5 rounded-lg text-xs font-bold bg-amber-500 text-slate-950 transition';
+                btn033.className = 'px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-300 hover:text-white transition';
+            } else {
+                btn033.className = 'px-3 py-1.5 rounded-lg text-xs font-bold bg-amber-500 text-slate-950 transition';
+                btn05.className = 'px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-300 hover:text-white transition';
+            }
+            renderConsumptionStats();
+        }
+
+        function renderConsumptionStats() {
+            const totalCaps = caps.reduce((sum, item) => sum + (Number(item.count) || 0), 0);
+            const totalBeerLiters = totalCaps * bottleVolumeLiters;
+            const WATER_RATIO = 4.0;
+            const totalWaterLiters = totalBeerLiters * WATER_RATIO;
+
+            let totalCaloriesKcal = 0;
+            caps.forEach(item => {
+                const cnt = Number(item.count) || 0;
+                const liters = cnt * bottleVolumeLiters;
+                const kcalPerLiter = (item.type === 'Nealko / Radler') ? 230 : (item.type === 'Speciál / IPA / APA' ? 520 : 430);
+                totalCaloriesKcal += liters * kcalPerLiter;
+            });
+
+            const totalMaltKg = totalBeerLiters * 0.18;
+            const totalLineMeters = totalCaps * 0.03;
+            const totalCapsGrams = totalCaps * 2.2;
+
+            const kegsCount = totalBeerLiters / 50;
+            const bathtubsCount = totalWaterLiters / 150;
+            const runKm = totalCaloriesKcal / 65;
+            const goulashPortions = totalCaloriesKcal / 550;
+
+            document.getElementById('statBeerLiters').textContent = `${totalBeerLiters.toLocaleString('cs-CZ', { maximumFractionDigits: 1 })} l`;
+            document.getElementById('statBeerKegs').textContent = `Odpovídá ${kegsCount.toLocaleString('cs-CZ', { maximumFractionDigits: 1 })} klasickým sudům (50 l)`;
+
+            document.getElementById('statWaterLiters').textContent = `${totalWaterLiters.toLocaleString('cs-CZ', { maximumFractionDigits: 1 })} l`;
+            document.getElementById('statWaterBathtubs').textContent = `Poměr 4 l vody na 1 l piva (${bathtubsCount.toLocaleString('cs-CZ', { maximumFractionDigits: 1 })} plných van)`;
+
+            document.getElementById('statCaloriesKcal').textContent = `${Math.round(totalCaloriesKcal).toLocaleString('cs-CZ')} kcal`;
+            document.getElementById('statCaloriesRun').textContent = `≈ ${runKm.toLocaleString('cs-CZ', { maximumFractionDigits: 1 })} km běhu nebo ${goulashPortions.toLocaleString('cs-CZ', { maximumFractionDigits: 1 })} porcí guláše`;
+
+            document.getElementById('statLineMeters').textContent = `${totalLineMeters.toLocaleString('cs-CZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} m`;
+            const weightStr = totalCapsGrams >= 1000
+                ? `${(totalCapsGrams / 1000).toLocaleString('cs-CZ', { maximumFractionDigits: 2 })} kg`
+                : `${Math.round(totalCapsGrams).toLocaleString('cs-CZ')} g`;
+            document.getElementById('statCapsWeight').textContent = `Hmotnost víček: ${weightStr} • Slad: ${totalMaltKg.toLocaleString('cs-CZ', { maximumFractionDigits: 1 })} kg`;
+
+            document.getElementById('barBeerLabel').textContent = `${totalBeerLiters.toLocaleString('cs-CZ', { maximumFractionDigits: 1 })} l`;
+            document.getElementById('barWaterLabel').textContent = `${totalWaterLiters.toLocaleString('cs-CZ', { maximumFractionDigits: 1 })} l`;
+
+            renderAchievementsAndOrigins(totalCaps, totalBeerLiters, totalLineMeters);
+
+            const typesContainer = document.getElementById('beerTypesBreakdown');
+            if (totalCaps === 0) {
+                typesContainer.innerHTML = `<p class="text-xs text-slate-500">Zatím nemáte ve sbírce žádná víčka.</p>`;
+            } else {
+                const typeMap = {};
+                caps.forEach(c => {
+                    const cnt = Number(c.count) || 0;
+                    if (cnt > 0) {
+                        const t = c.type || 'Jiné';
+                        typeMap[t] = (typeMap[t] || 0) + cnt;
+                    }
+                });
+
+                const sortedTypes = Object.entries(typeMap).sort((a, b) => b[1] - a[1]);
+                typesContainer.innerHTML = sortedTypes.map(([typeName, cnt]) => {
+                    const liters = cnt * bottleVolumeLiters;
+                    const pct = Math.round((cnt / totalCaps) * 100);
+                    return `
+                        <div>
+                            <div class="flex justify-between text-xs mb-1">
+                                <span class="text-slate-300 font-medium">${escapeHtml(typeName)}</span>
+                                <span class="text-slate-400"><strong class="text-white">${liters.toLocaleString('cs-CZ', { maximumFractionDigits: 1 })} l</strong> (${pct} %)</span>
+                            </div>
+                            <div class="w-full h-2 bg-slate-950 rounded-full overflow-hidden">
+                                <div class="h-full bg-amber-500/80 rounded-full" style="width: ${pct}%"></div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+
+            const chartContainer = document.getElementById('brandsChartContainer');
+            const activeBrands = [...caps].filter(c => (Number(c.count) || 0) > 0).sort((a, b) => b.count - a.count);
+
+            if (activeBrands.length === 0) {
+                chartContainer.innerHTML = `
+                    <div class="bg-slate-950/60 border border-slate-800 border-dashed rounded-xl p-8 text-center">
+                        <p class="text-sm text-slate-400">Přidejte víčka do sbírky a graf automaticky spočítá vypité pivo i spotřebovanou vodu.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const maxCount = activeBrands[0].count;
+            chartContainer.innerHTML = activeBrands.map(cap => {
+                const cnt = Number(cap.count) || 0;
+                const beerL = cnt * bottleVolumeLiters;
+                const waterL = beerL * WATER_RATIO;
+                const waterBarWidth = Math.max(8, (cnt / maxCount) * 100);
+                const beerBarWidth = Math.max(3, waterBarWidth * 0.25);
+
+                return `
+                    <div class="bg-slate-950/70 border border-slate-800/90 rounded-xl p-3.5 space-y-2">
+                        <div class="flex flex-wrap items-center justify-between gap-2">
+                            <div class="flex items-center gap-2 min-w-0">
+                                <span class="w-3.5 h-3.5 rounded-full shrink-0 border border-white/20" style="background-color: ${cap.color || '#f59e0b'}"></span>
+                                <span class="text-sm font-bold text-white truncate">${escapeHtml(cap.brand)}</span>
+                                <span class="text-xs text-slate-400">(${cnt} ks)</span>
+                            </div>
+                            <div class="flex items-center gap-3 text-xs font-semibold tabular-nums">
+                                <span class="text-amber-400">${beerL.toLocaleString('cs-CZ', { maximumFractionDigits: 1 })} l piva</span>
+                                <span class="text-slate-600">•</span>
+                                <span class="text-sky-400">${waterL.toLocaleString('cs-CZ', { maximumFractionDigits: 1 })} l vody</span>
+                            </div>
+                        </div>
+
+                        <div class="space-y-1.5">
+                            <div class="w-full h-2.5 bg-slate-900 rounded-full overflow-hidden">
+                                <div class="h-full rounded-full transition-all duration-300" style="width: ${beerBarWidth}%; background-color: ${cap.color || '#f59e0b'}"></div>
+                            </div>
+                            <div class="w-full h-2 bg-slate-900 rounded-full overflow-hidden">
+                                <div class="h-full bg-sky-500/85 rounded-full transition-all duration-300" style="width: ${waterBarWidth}%"></div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderAchievementsAndOrigins(totalCaps, totalBeerLiters, totalLineMeters) {
+            const uniqueBrands = caps.filter(c => (Number(c.count) || 0) > 0).length;
+            const originsMap = {};
+            caps.forEach(c => {
+                const cnt = Number(c.count) || 0;
+                if (cnt > 0) {
+                    const org = (c.origin || 'Neuvedeno').trim();
+                    originsMap[org] = (originsMap[org] || 0) + cnt;
+                }
+            });
+            const knownRegionsCount = Object.keys(originsMap).filter(k => k !== 'Neuvedeno').length;
+
+            const badges = [
+                {
+                    title: 'První padesátka',
+                    desc: 'Nasbírej celkem alespoň 50 víček',
+                    current: totalCaps,
+                    target: 50,
+                    unit: 'ks'
+                },
+                {
+                    title: 'Stovka v kapse',
+                    desc: 'Dosáhni hranice 100 pivních víček',
+                    current: totalCaps,
+                    target: 100,
+                    unit: 'ks'
+                },
+                {
+                    title: 'Znalec značek',
+                    desc: 'Měj ve sbírce alespoň 10 různých druhů',
+                    current: uniqueBrands,
+                    target: 10,
+                    unit: 'značek'
+                },
+                {
+                    title: 'Plný padesátkový sud',
+                    desc: 'Vypij celkem 50 litrů piva',
+                    current: Math.round(totalBeerLiters * 10) / 10,
+                    target: 50,
+                    unit: 'l'
+                },
+                {
+                    title: 'Pivní cestovatel',
+                    desc: 'Nasbírej víčka ze 3 různých regionů či zemí',
+                    current: knownRegionsCount,
+                    target: 3,
+                    unit: 'oblastí'
+                },
+                {
+                    title: 'Třímetrový had',
+                    desc: 'Víčka za sebou měří alespoň 3,0 metry',
+                    current: Math.round(totalLineMeters * 100) / 100,
+                    target: 3,
+                    unit: 'm'
+                }
+            ];
+
+            const unlockedCount = badges.filter(b => b.current >= b.target).length;
+            const progressBadge = document.getElementById('badgesProgressBadge');
+            if (progressBadge) {
+                progressBadge.textContent = `${unlockedCount} / ${badges.length} odemčeno`;
+            }
+
+            const achGrid = document.getElementById('achievementsGrid');
+            if (achGrid) {
+                achGrid.innerHTML = badges.map(b => {
+                    const unlocked = b.current >= b.target;
+                    const pct = Math.min(100, Math.round((b.current / b.target) * 100));
+                    return `
+                        <div class="rounded-xl p-3.5 border transition ${unlocked ? 'bg-amber-500/10 border-amber-500/40' : 'bg-slate-950/70 border-slate-800'}">
+                            <div class="flex items-start justify-between gap-2">
+                                <div class="flex items-center gap-2.5">
+                                    <div class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0 ${unlocked ? 'bg-amber-500 text-slate-950 shadow-md shadow-amber-500/20' : 'bg-slate-800 text-slate-500'}">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            ${unlocked
+                                                ? '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>'
+                                                : '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>'}
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <h4 class="text-sm font-bold ${unlocked ? 'text-amber-300' : 'text-slate-200'}">${b.title}</h4>
+                                        <p class="text-[11px] text-slate-400">${b.desc}</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mt-3">
+                                <div class="flex justify-between text-[11px] mb-1">
+                                    <span class="${unlocked ? 'text-amber-400 font-semibold' : 'text-slate-400'}">${unlocked ? 'Odemčeno!' : `${b.current} / ${b.target} ${b.unit}`}</span>
+                                    <span class="text-slate-500">${pct} %</span>
+                                </div>
+                                <div class="w-full h-1.5 bg-slate-900 rounded-full overflow-hidden">
+                                    <div class="h-full rounded-full transition-all duration-300 ${unlocked ? 'bg-amber-400' : 'bg-slate-600'}" style="width: ${pct}%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+
+            const originsGrid = document.getElementById('originsBreakdownGrid');
+            const regionsBadge = document.getElementById('regionsCountBadge');
+            const sortedOrigins = Object.entries(originsMap).sort((a, b) => b[1] - a[1]);
+
+            if (regionsBadge) {
+                regionsBadge.textContent = `${knownRegionsCount} ${knownRegionsCount === 1 ? 'oblast' : (knownRegionsCount >= 2 && knownRegionsCount <= 4 ? 'oblasti' : 'oblastí')}`;
+            }
+
+            if (originsGrid) {
+                if (sortedOrigins.length === 0) {
+                    originsGrid.innerHTML = `<p class="text-xs text-slate-500 col-span-full">Zatím nemáte ve sbírce žádná víčka.</p>`;
+                } else {
+                    originsGrid.innerHTML = sortedOrigins.map(([regionName, count]) => {
+                        const pct = totalCaps > 0 ? Math.round((count / totalCaps) * 100) : 0;
+                        return `
+                            <div class="bg-slate-950/70 border border-slate-800 rounded-xl p-3.5 flex flex-col justify-between gap-2">
+                                <div class="flex items-center justify-between gap-2">
+                                    <span class="text-xs font-bold text-white truncate" title="${escapeHtml(regionName)}">${escapeHtml(regionName)}</span>
+                                    <span class="text-xs font-extrabold text-emerald-400 shrink-0">${count} ks</span>
+                                </div>
+                                <div class="w-full h-1.5 bg-slate-900 rounded-full overflow-hidden">
+                                    <div class="h-full bg-emerald-500 rounded-full" style="width: ${pct}%"></div>
+                                </div>
+                                <span class="text-[11px] text-slate-500">${pct} % celé sbírky</span>
+                            </div>
+                        `;
+                    }).join('');
+                }
+            }
+        }
+
+        function initPlannerControls() {
+            const widthInput = document.getElementById('frameWidthInput');
+            const widthSlider = document.getElementById('frameWidthSlider');
+            const heightInput = document.getElementById('frameHeightInput');
+            const heightSlider = document.getElementById('frameHeightSlider');
+            const gapInput = document.getElementById('capGapInput');
+            const borderInput = document.getElementById('frameBorderInput');
+
+            const syncWidth = (val) => {
+                const w = Math.min(250, Math.max(10, parseFloat(val) || 60));
+                plannerState.widthCm = w;
+                widthInput.value = w;
+                widthSlider.value = Math.min(200, w);
+                updatePlanner();
+            };
+
+            const syncHeight = (val) => {
+                const h = Math.min(250, Math.max(10, parseFloat(val) || 40));
+                plannerState.heightCm = h;
+                heightInput.value = h;
+                heightSlider.value = Math.min(200, h);
+                updatePlanner();
+            };
+
+            widthInput.addEventListener('input', (e) => syncWidth(e.target.value));
+            widthSlider.addEventListener('input', (e) => syncWidth(e.target.value));
+            heightInput.addEventListener('input', (e) => syncHeight(e.target.value));
+            heightSlider.addEventListener('input', (e) => syncHeight(e.target.value));
+
+            gapInput.addEventListener('input', (e) => {
+                plannerState.gapMm = Math.min(20, Math.max(0, parseFloat(e.target.value) || 0));
+                updatePlanner();
+            });
+
+            borderInput.addEventListener('input', (e) => {
+                plannerState.borderCm = Math.min(20, Math.max(0, parseFloat(e.target.value) || 0));
+                updatePlanner();
+            });
+
+            window.addEventListener('resize', () => {
+                if (!document.getElementById('viewPlanner').classList.contains('hidden')) {
+                    drawMosaicCanvas();
+                }
+            });
+
+            const canvas = document.getElementById('mosaicCanvas');
+
+            const handlePointerPaint = (clientX, clientY) => {
+                if (plannerState.previewMode !== 'design') return;
+                const rect = canvas.getBoundingClientRect();
+                const scaleX = canvas.width / rect.width;
+                const scaleY = canvas.height / rect.height;
+                const x = (clientX - rect.left) * scaleX;
+                const y = (clientY - rect.top) * scaleY;
+
+                for (let i = 0; i < plannerState.gridCells.length; i++) {
+                    const cell = plannerState.gridCells[i];
+                    const dx = x - cell.px;
+                    const dy = y - cell.py;
+                    if (dx * dx + dy * dy <= cell.pr * cell.pr * 1.15) {
+                        const key = `${cell.r}-${cell.c}`;
+                        if (plannerState.selectedBrushColor === 'ERASE') {
+                            delete plannerState.customCells[key];
+                        } else {
+                            plannerState.customCells[key] = plannerState.selectedBrushColor;
+                        }
+                        drawMosaicCanvas();
+                        break;
+                    }
+                }
+            };
+
+            canvas.addEventListener('mousedown', (e) => {
+                plannerState.isDrawing = true;
+                handlePointerPaint(e.clientX, e.clientY);
+            });
+            window.addEventListener('mouseup', () => {
+                plannerState.isDrawing = false;
+            });
+            canvas.addEventListener('mousemove', (e) => {
+                if (plannerState.isDrawing) {
+                    handlePointerPaint(e.clientX, e.clientY);
+                }
+            });
+
+            canvas.addEventListener('touchstart', (e) => {
+                if (plannerState.previewMode !== 'design') return;
+                e.preventDefault();
+                plannerState.isDrawing = true;
+                const touch = e.touches[0];
+                handlePointerPaint(touch.clientX, touch.clientY);
+            }, { passive: false });
+
+            canvas.addEventListener('touchmove', (e) => {
+                if (!plannerState.isDrawing || plannerState.previewMode !== 'design') return;
+                e.preventDefault();
+                const touch = e.touches[0];
+                handlePointerPaint(touch.clientX, touch.clientY);
+            }, { passive: false });
+
+            canvas.addEventListener('touchend', () => {
+                plannerState.isDrawing = false;
+            });
+        }
+
+        function applyFramePreset(w, h) {
+            plannerState.widthCm = w;
+            plannerState.heightCm = h;
+            document.getElementById('frameWidthInput').value = w;
+            document.getElementById('frameWidthSlider').value = Math.min(200, w);
+            document.getElementById('frameHeightInput').value = h;
+            document.getElementById('frameHeightSlider').value = Math.min(200, h);
+            updatePlanner();
+        }
+
+        function swapFrameDimensions() {
+            applyFramePreset(plannerState.heightCm, plannerState.widthCm);
+        }
+
+        function setLayoutPattern(pattern) {
+            plannerState.layout = pattern;
+            const gridBtn = document.getElementById('layoutGridBtn');
+            const hexBtn = document.getElementById('layoutHexBtn');
+
+            if (pattern === 'grid') {
+                gridBtn.className = 'p-3 rounded-xl border text-left transition bg-amber-500/10 border-amber-500 text-white';
+                hexBtn.className = 'p-3 rounded-xl border text-left transition bg-slate-950 border-slate-800 text-slate-300 hover:border-slate-700';
+            } else {
+                hexBtn.className = 'p-3 rounded-xl border text-left transition bg-amber-500/10 border-amber-500 text-white';
+                gridBtn.className = 'p-3 rounded-xl border text-left transition bg-slate-950 border-slate-800 text-slate-300 hover:border-slate-700';
+            }
+            updatePlanner();
+        }
+
+        function setPreviewMode(mode) {
+            plannerState.previewMode = mode;
+            const btnColl = document.getElementById('previewModeCollectionBtn');
+            const btnDesign = document.getElementById('previewModeDesignBtn');
+            const designControls = document.getElementById('designPatternControls');
+            const brushBar = document.getElementById('brushPaletteBar');
+            const legendLeft = document.getElementById('canvasLegendLeft');
+
+            if (mode === 'collection') {
+                btnColl.className = 'px-3.5 py-2 rounded-xl text-xs font-bold bg-amber-500 text-slate-950 transition';
+                btnDesign.className = 'px-3.5 py-2 rounded-xl text-xs font-semibold bg-slate-950 text-slate-300 border border-slate-700 hover:text-white transition';
+                designControls.classList.add('hidden');
+                brushBar.classList.add('hidden');
+                legendLeft.innerHTML = `
+                    <span class="flex items-center gap-1.5">
+                        <span class="w-3 h-3 rounded-full bg-amber-500 inline-block"></span>
+                        Nasbíraná víčka (reálné barvy)
+                    </span>
+                    <span class="flex items-center gap-1.5">
+                        <span class="w-3 h-3 rounded-full border border-dashed border-slate-600 inline-block"></span>
+                        Chybějící místa
+                    </span>
+                `;
+            } else {
+                btnDesign.className = 'px-3.5 py-2 rounded-xl text-xs font-bold bg-amber-500 text-slate-950 transition';
+                btnColl.className = 'px-3.5 py-2 rounded-xl text-xs font-semibold bg-slate-950 text-slate-300 border border-slate-700 hover:text-white transition';
+                designControls.classList.remove('hidden');
+                brushBar.classList.remove('hidden');
+                legendLeft.innerHTML = `
+                    <span class="text-slate-300">Tip: Kliknutím nebo tažením po víčkách malujete vybranou barvou.</span>
+                `;
+                renderPlannerBrushPalette();
+                if (Object.keys(plannerState.customCells).length === 0) {
+                    generatePresetPattern(document.getElementById('presetPatternSelect').value);
+                    return;
+                }
+            }
+            drawMosaicCanvas();
+        }
+
+        function renderPlannerBrushPalette() {
+            const container = document.getElementById('plannerBrushSwatches');
+            if (!container) return;
+
+            const seenHex = new Set();
+            const paletteItems = [];
+
+            caps.forEach(c => {
+                if (c.count > 0 && c.color && !seenHex.has(c.color.toLowerCase())) {
+                    seenHex.add(c.color.toLowerCase());
+                    paletteItems.push({
+                        hex: c.color,
+                        name: `${c.brand} (${c.count} ks)`,
+                        fromCollection: true
+                    });
+                }
+            });
+
+            CAP_COLORS.forEach(c => {
+                if (!seenHex.has(c.hex.toLowerCase())) {
+                    seenHex.add(c.hex.toLowerCase());
+                    paletteItems.push({
+                        hex: c.hex,
+                        name: c.name,
+                        fromCollection: false
+                    });
+                }
+            });
+
+            let html = paletteItems.map(item => {
+                const isSelected = plannerState.selectedBrushColor.toLowerCase() === item.hex.toLowerCase();
+                return `
+                    <button type="button" 
+                        onclick="selectPlannerBrush('${item.hex}', '${escapeHtml(item.name)}')"
+                        title="${escapeHtml(item.name)}"
+                        class="w-8 h-8 rounded-full border-2 transition transform hover:scale-110 flex items-center justify-center ${isSelected ? 'ring-2 ring-white scale-110 border-white' : 'border-slate-700'}"
+                        style="background-color: ${item.hex};">
+                        ${item.fromCollection ? '<span class="w-1.5 h-1.5 rounded-full bg-white/80 shadow"></span>' : ''}
+                    </button>
+                `;
+            }).join('');
+
+            const isErase = plannerState.selectedBrushColor === 'ERASE';
+            html += `
+                <button type="button" 
+                    onclick="selectPlannerBrush('ERASE', 'Guma (prázdné místo)')"
+                    title="Guma (vymazat víčko)"
+                    class="px-2.5 h-8 rounded-full border text-xs font-semibold transition flex items-center gap-1 ${isErase ? 'bg-rose-600 border-white text-white' : 'bg-slate-900 border-slate-700 text-slate-300 hover:border-slate-500'}">
+                    <span>Guma</span>
+                </button>
+            `;
+
+            container.innerHTML = html;
+        }
+
+        function selectPlannerBrush(hex, name) {
+            plannerState.selectedBrushColor = hex;
+            plannerState.selectedBrushName = name;
+            document.getElementById('activeBrushLabel').textContent = name;
+            renderPlannerBrushPalette();
+        }
+
+        function updatePlanner() {
+            const innerW = Math.max(0, plannerState.widthCm - 2 * plannerState.borderCm);
+            const innerH = Math.max(0, plannerState.heightCm - 2 * plannerState.borderCm);
+            const gapCm = plannerState.gapMm / 10;
+            const pitch = CAP_DIAMETER_CM + gapCm;
+
+            const cells = [];
+            let cols = 0;
+            let rows = 0;
+
+            if (innerW >= CAP_DIAMETER_CM && innerH >= CAP_DIAMETER_CM) {
+                if (plannerState.layout === 'grid') {
+                    cols = Math.floor((innerW + gapCm) / pitch);
+                    rows = Math.floor((innerH + gapCm) / pitch);
+
+                    const usedW = cols * pitch - gapCm;
+                    const usedH = rows * pitch - gapCm;
+                    const offsetX = plannerState.borderCm + (innerW - usedW) / 2 + CAP_DIAMETER_CM / 2;
+                    const offsetY = plannerState.borderCm + (innerH - usedH) / 2 + CAP_DIAMETER_CM / 2;
+
+                    for (let r = 0; r < rows; r++) {
+                        for (let c = 0; c < cols; c++) {
+                            cells.push({
+                                r,
+                                c,
+                                xCm: offsetX + c * pitch,
+                                yCm: offsetY + r * pitch
+                            });
+                        }
+                    }
+                } else {
+                    const rowStepY = pitch * Math.sin(Math.PI / 3);
+                    rows = 1 + Math.floor((innerH - CAP_DIAMETER_CM) / rowStepY);
+                    cols = Math.floor((innerW + gapCm) / pitch);
+
+                    const oddRowFitsSameCols = ((cols - 1) * pitch + 0.5 * pitch + CAP_DIAMETER_CM) <= innerW + 0.001;
+                    const oddCols = oddRowFitsSameCols ? cols : Math.max(0, cols - 1);
+
+                    const totalSpanW = oddRowFitsSameCols
+                        ? ((cols - 1) * pitch + 0.5 * pitch + CAP_DIAMETER_CM)
+                        : ((cols - 1) * pitch + CAP_DIAMETER_CM);
+                    const totalSpanH = (rows - 1) * rowStepY + CAP_DIAMETER_CM;
+
+                    const offsetX = plannerState.borderCm + (innerW - totalSpanW) / 2 + CAP_DIAMETER_CM / 2;
+                    const offsetY = plannerState.borderCm + (innerH - totalSpanH) / 2 + CAP_DIAMETER_CM / 2;
+
+                    for (let r = 0; r < rows; r++) {
+                        const isOdd = r % 2 === 1;
+                        const rowCols = isOdd ? oddCols : cols;
+                        const shiftX = isOdd ? pitch * 0.5 : 0;
+                        for (let c = 0; c < rowCols; c++) {
+                            cells.push({
+                                r,
+                                c,
+                                xCm: offsetX + shiftX + c * pitch,
+                                yCm: offsetY + r * rowStepY
+                            });
+                        }
+                    }
+                }
+            }
+
+            plannerState.calculatedCells = cells;
+            const needed = cells.length;
+            const owned = caps.reduce((sum, item) => sum + (Number(item.count) || 0), 0);
+            const diff = owned - needed;
+            const percent = needed > 0 ? Math.min(100, Math.round((owned / needed) * 100)) : 100;
+
+            document.getElementById('planNeededCaps').textContent = needed.toLocaleString('cs-CZ');
+            document.getElementById('planGridInfo').textContent = plannerState.layout === 'hex'
+                ? `${rows} řad × ~${cols} sloupců (plástev)`
+                : `${cols} sloupců × ${rows} řad`;
+
+            document.getElementById('planOwnedCaps').textContent = owned.toLocaleString('cs-CZ');
+            document.getElementById('planPercentBadge').textContent = `${percent} %`;
+
+            const diffEl = document.getElementById('planDiffText');
+            const statusLabel = document.getElementById('planStatusLabel');
+            if (needed === 0) {
+                diffEl.textContent = 'Zvětšete rozměr obrazu';
+                diffEl.className = 'text-xs font-medium text-slate-400 mt-1';
+                statusLabel.textContent = 'Malý rozměr';
+            } else if (diff >= 0) {
+                diffEl.textContent = `Máš dostatek! (Přebytek +${diff.toLocaleString('cs-CZ')} ks)`;
+                diffEl.className = 'text-xs font-semibold text-emerald-400 mt-1';
+                statusLabel.textContent = 'Připraveno k lepení!';
+                statusLabel.className = 'text-xs font-bold text-emerald-400';
+            } else {
+                diffEl.textContent = `Chybí ještě ${Math.abs(diff).toLocaleString('cs-CZ')} ks`;
+                diffEl.className = 'text-xs font-semibold text-rose-400 mt-1';
+                statusLabel.textContent = `Chybí ${100 - percent} %`;
+                statusLabel.className = 'text-xs font-semibold text-amber-400';
+            }
+
+            document.getElementById('planProgressBar').style.width = `${percent}%`;
+            document.getElementById('planInnerSize').textContent = `${innerW.toFixed(1).replace('.0', '')} × ${innerH.toFixed(1).replace('.0', '')} cm`;
+
+            const areaM2 = (innerW * innerH) / 10000;
+            const density = areaM2 > 0 ? Math.round(needed / areaM2) : 0;
+            document.getElementById('planDensityText').textContent = `Hustota: ~${density.toLocaleString('cs-CZ')} víček / m²`;
+            document.getElementById('canvasDimensionsBadge').textContent = `Rám: ${plannerState.widthCm} × ${plannerState.heightCm} cm`;
+
+            drawMosaicCanvas();
+        }
+
+        function getOwnedColorsPool() {
+            const pool = [];
+            caps.forEach(cap => {
+                const count = Math.max(0, Number(cap.count) || 0);
+                for (let i = 0; i < count; i++) {
+                    pool.push(cap.color || '#f59e0b');
+                }
+            });
+            return pool;
+        }
+
+        function generatePresetPattern(patternType) {
+            const cells = plannerState.calculatedCells || [];
+            if (cells.length === 0) return;
+
+            const ownedPool = getOwnedColorsPool();
+            const palette = ownedPool.length > 0
+                ? [...new Set(ownedPool)]
+                : ['#f59e0b', '#16a34a', '#dc2626', '#2563eb', '#e2e8f0'];
+
+            const primaryColor = palette[0] || '#f59e0b';
+            const secondaryColor = palette[1] || '#1e293b';
+            const accentColor = palette[2] || '#dc2626';
+
+            const newCustom = {};
+            const cx = plannerState.widthCm / 2;
+            const cy = plannerState.heightCm / 2;
+            const minSide = Math.min(
+                Math.max(1, plannerState.widthCm - 2 * plannerState.borderCm),
+                Math.max(1, plannerState.heightCm - 2 * plannerState.borderCm)
+            );
+
+            cells.forEach((cell) => {
+                const key = `${cell.r}-${cell.c}`;
+                if (patternType === 'random') {
+                    if (ownedPool.length > 0) {
+                        newCustom[key] = ownedPool[Math.floor(Math.random() * ownedPool.length)];
+                    } else {
+                        newCustom[key] = palette[Math.floor(Math.random() * palette.length)];
+                    }
+                } else if (patternType === 'stripes') {
+                    newCustom[key] = palette[cell.r % palette.length];
+                } else if (patternType === 'checker') {
+                    newCustom[key] = (cell.r + cell.c) % 2 === 0 ? primaryColor : secondaryColor;
+                } else if (patternType === 'diagonal') {
+                    newCustom[key] = palette[(cell.r + cell.c) % palette.length];
+                } else if (patternType === 'circle') {
+                    const dist = Math.hypot(cell.xCm - cx, cell.yCm - cy);
+                    if (dist < minSide * 0.22) newCustom[key] = accentColor;
+                    else if (dist < minSide * 0.38) newCustom[key] = primaryColor;
+                    else newCustom[key] = secondaryColor;
+                } else if (patternType === 'heart') {
+                    const nx = (cell.xCm - cx) / (minSide * 0.36);
+                    const ny = -(cell.yCm - cy - minSide * 0.03) / (minSide * 0.36);
+                    const eq = Math.pow(nx * nx + ny * ny - 1, 3) - nx * nx * Math.pow(ny, 3);
+                    newCustom[key] = eq <= 0 ? '#dc2626' : '#1e293b';
+                }
+            });
+
+            plannerState.customCells = newCustom;
+            drawMosaicCanvas();
+        }
+
+        function fillCanvasFromCollection() {
+            const cells = plannerState.calculatedCells || [];
+            const ownedPool = getOwnedColorsPool();
+            if (ownedPool.length === 0) {
+                showToast('Ve sbírce zatím nemáte žádná víčka.', 'error');
+                return;
+            }
+            const newCustom = {};
+            cells.forEach((cell, idx) => {
+                newCustom[`${cell.r}-${cell.c}`] = ownedPool[idx % ownedPool.length];
+            });
+            plannerState.customCells = newCustom;
+            drawMosaicCanvas();
+            showToast('Plátno vyplněno barvami z vaší sbírky.');
+        }
+
+        function clearCustomCanvas() {
+            plannerState.customCells = {};
+            drawMosaicCanvas();
+            showToast('Návrh byl vymazán.');
+        }
+
+        function drawMosaicCanvas() {
+            const canvas = document.getElementById('mosaicCanvas');
+            const wrapper = document.getElementById('canvasWrapper');
+            if (!canvas || !wrapper) return;
+
+            const ctx = canvas.getContext('2d');
+            const dpr = window.devicePixelRatio || 1;
+
+            const availW = Math.max(260, wrapper.clientWidth - 48);
+            const availH = 440;
+
+            const aspect = plannerState.widthCm / plannerState.heightCm;
+            let displayW = availW;
+            let displayH = displayW / aspect;
+
+            if (displayH > availH) {
+                displayH = availH;
+                displayW = displayH * aspect;
+            }
+
+            canvas.style.width = `${Math.round(displayW)}px`;
+            canvas.style.height = `${Math.round(displayH)}px`;
+            canvas.width = Math.round(displayW * dpr);
+            canvas.height = Math.round(displayH * dpr);
+
+            const scale = canvas.width / plannerState.widthCm;
+
+            ctx.fillStyle = '#0f172a';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            const borderPx = plannerState.borderCm * scale;
+            if (borderPx > 0) {
+                ctx.strokeStyle = '#78350f';
+                ctx.lineWidth = borderPx * 2;
+                ctx.strokeRect(0, 0, canvas.width, canvas.height);
+
+                ctx.strokeStyle = 'rgba(245, 158, 11, 0.35)';
+                ctx.lineWidth = Math.max(1.5, 1.5 * dpr);
+                ctx.strokeRect(borderPx, borderPx, canvas.width - 2 * borderPx, canvas.height - 2 * borderPx);
+            }
+
+            const cells = plannerState.calculatedCells || [];
+            const radiusPx = (CAP_DIAMETER_CM / 2) * scale * (plannerState.gapMm === 0 ? 1.0 : 0.98);
+            const ownedPool = plannerState.previewMode === 'collection' ? getOwnedColorsPool() : [];
+
+            plannerState.gridCells = [];
+
+            cells.forEach((cell, index) => {
+                const px = cell.xCm * scale;
+                const py = cell.yCm * scale;
+                plannerState.gridCells.push({ r: cell.r, c: cell.c, px, py, pr: radiusPx });
+
+                let fillColor = null;
+                if (plannerState.previewMode === 'collection') {
+                    if (index < ownedPool.length) {
+                        fillColor = ownedPool[index];
+                    }
+                } else {
+                    const key = `${cell.r}-${cell.c}`;
+                    fillColor = plannerState.customCells[key] || null;
+                }
+
+                ctx.beginPath();
+                ctx.arc(px, py, radiusPx, 0, Math.PI * 2);
+
+                if (fillColor) {
+                    ctx.fillStyle = fillColor;
+                    ctx.fill();
+
+                    ctx.lineWidth = Math.max(1, radiusPx * 0.12);
+                    ctx.strokeStyle = isLightColor(fillColor) ? 'rgba(15, 23, 42, 0.35)' : 'rgba(255, 255, 255, 0.28)';
+                    ctx.stroke();
+
+                    if (radiusPx > 7) {
+                        ctx.beginPath();
+                        ctx.arc(px, py, radiusPx * 0.72, 0, Math.PI * 2);
+                        ctx.lineWidth = Math.max(0.8, radiusPx * 0.06);
+                        ctx.strokeStyle = isLightColor(fillColor) ? 'rgba(15, 23, 42, 0.18)' : 'rgba(255, 255, 255, 0.18)';
+                        ctx.stroke();
+                    }
+                } else {
+                    ctx.fillStyle = 'rgba(30, 41, 59, 0.35)';
+                    ctx.fill();
+                    ctx.save();
+                    ctx.setLineDash([Math.max(2, radiusPx * 0.25), Math.max(2, radiusPx * 0.25)]);
+                    ctx.lineWidth = Math.max(0.8, 1 * dpr);
+                    ctx.strokeStyle = 'rgba(100, 116, 139, 0.45)';
+                    ctx.stroke();
+                    ctx.restore();
+                }
+            });
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function getInitials(name) {
+            if (!name) return 'P';
+            const words = name.trim().split(/\s+/);
+            if (words.length === 1) {
+                return words[0].substring(0, 2).toUpperCase();
+            }
+            return (words[0][0] + words[1][0]).toUpperCase();
+        }
+
+        function isLightColor(hex) {
+            const clean = hex.replace('#', '');
+            if (clean.length !== 6) return false;
+            const r = parseInt(clean.substring(0, 2), 16);
+            const g = parseInt(clean.substring(2, 4), 16);
+            const b = parseInt(clean.substring(4, 6), 16);
+            const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+            return luminance > 0.65;
+        }
+
+        function openCapModal(id = null) {
+            const modal = document.getElementById('capModal');
+            const title = document.getElementById('modalTitle');
+            document.getElementById('capForm').reset();
+            clearCapPhoto();
+            clearBrandPreset();
+
+            if (id) {
+                const cap = caps.find(c => c.id === id);
+                if (!cap) return;
+                title.textContent = 'Upravit víčko';
+                document.getElementById('capId').value = cap.id;
+                document.getElementById('capBrand').value = cap.brand;
+                document.getElementById('capType').value = cap.type || 'Světlý ležák';
+                document.getElementById('capCount').value = cap.count;
+                document.getElementById('capOrigin').value = cap.origin || '';
+                document.getElementById('capNote').value = cap.note || '';
+                selectCapColor(cap.color || '#f59e0b');
+                const matchedDesign = resolveBrandDesign(cap.brand, cap.designKey);
+                if (matchedDesign) {
+                    document.getElementById('capDesignKey').value = matchedDesign.key;
+                    highlightSelectedDesign(matchedDesign.key);
+                }
+                if (cap.photo) {
+                    setCapPhotoPreview(cap.photo);
+                }
+            } else {
+                title.textContent = 'Přidat nové víčko';
+                document.getElementById('capId').value = '';
+                document.getElementById('capCount').value = 1;
+                selectCapColor('#f59e0b');
+            }
+
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            setTimeout(() => document.getElementById('capBrand').focus(), 50);
+        }
+
+        function closeCapModal() {
+            const modal = document.getElementById('capModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        function handleCapPhotoUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const img = new Image();
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    const size = 160;
+                    canvas.width = size;
+                    canvas.height = size;
+                    const ctx = canvas.getContext('2d');
+
+                    const minSide = Math.min(img.width, img.height);
+                    const sx = (img.width - minSide) / 2;
+                    const sy = (img.height - minSide) / 2;
+                    ctx.drawImage(img, sx, sy, minSide, minSide, 0, 0, size, size);
+
+                    const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.8);
+                    setCapPhotoPreview(compressedDataUrl);
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function setCapPhotoPreview(dataUrl) {
+            document.getElementById('capPhotoData').value = dataUrl;
+            document.getElementById('capPhotoPreviewBox').innerHTML = `<img src="${dataUrl}" alt="Náhled víčka" class="w-full h-full object-cover">`;
+            document.getElementById('removeCapPhotoBtn').classList.remove('hidden');
+        }
+
+        function clearCapPhoto() {
+            const photoData = document.getElementById('capPhotoData');
+            const photoInput = document.getElementById('capPhotoInput');
+            const previewBox = document.getElementById('capPhotoPreviewBox');
+            const removeBtn = document.getElementById('removeCapPhotoBtn');
+            if (photoData) photoData.value = '';
+            if (photoInput) photoInput.value = '';
+            if (removeBtn) removeBtn.classList.add('hidden');
+            if (previewBox) {
+                previewBox.innerHTML = `
+                    <svg class="w-5 h-5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/>
+                    </svg>
+                `;
+            }
+        }
+
+        function saveCap(event) {
+            event.preventDefault();
+            const id = document.getElementById('capId').value;
+            const brand = document.getElementById('capBrand').value.trim();
+            const type = document.getElementById('capType').value;
+            const count = Math.max(0, parseInt(document.getElementById('capCount').value, 10) || 0);
+            const color = document.getElementById('capColor').value || '#f59e0b';
+            const designKey = document.getElementById('capDesignKey').value || '';
+            const origin = document.getElementById('capOrigin').value.trim();
+            const photo = document.getElementById('capPhotoData').value || '';
+            const note = document.getElementById('capNote').value.trim();
+
+            if (!brand) return;
+
+            if (id) {
+                const idx = caps.findIndex(c => c.id === id);
+                if (idx !== -1) {
+                    caps[idx] = { ...caps[idx], brand, type, count, color, designKey, origin, photo, note };
+                    showToast(`Víčko „${brand}“ bylo upraveno.`);
+                }
+            } else {
+                caps.unshift({
+                    id: 'cap-' + Date.now() + '-' + Math.random().toString(36).substring(2, 6),
+                    brand,
+                    type,
+                    count,
+                    color,
+                    designKey,
+                    origin,
+                    photo,
+                    note,
+                    createdAt: Date.now()
+                });
+                showToast(`Přidáno do sbírky: ${brand}`);
+            }
+
+            saveData();
+            closeCapModal();
+            renderAll();
+        }
+
+        function clearSearch() {
+            const input = document.getElementById('searchInput');
+            input.value = '';
+            document.getElementById('clearSearchBtn').classList.add('hidden');
+            renderGrid();
+        }
+
+        function askDeleteCap(id) {
+            const cap = caps.find(c => c.id === id);
+            if (!cap) return;
+            openConfirmModal(
+                'Smazat víčko ze sbírky?',
+                `Opravdu chcete odstranit „${cap.brand}“ (${cap.count} ks)?`,
+                () => {
+                    caps = caps.filter(c => c.id !== id);
+                    saveData();
+                    renderAll();
+                    showToast('Víčko bylo odstraněno.');
+                }
+            );
+        }
+
+        function openBackupModal() {
+            const modal = document.getElementById('backupModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeBackupModal() {
+            const modal = document.getElementById('backupModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        function openConfirmModal(title, message, onConfirm) {
+            document.getElementById('confirmTitle').textContent = title;
+            document.getElementById('confirmMessage').textContent = message;
+            confirmCallback = onConfirm;
+            const modal = document.getElementById('confirmModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeConfirmModal() {
+            const modal = document.getElementById('confirmModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+            confirmCallback = null;
+        }
+
+        function exportData() {
+            const dataStr = JSON.stringify(caps, null, 2);
+            const blob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            const dateTag = new Date().toISOString().slice(0, 10);
+            a.href = url;
+            a.download = `pivni-vicka-zaloha-${dateTag}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            showToast('Záloha sbírky byla stažena.');
+        }
+
+        function importData(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const imported = JSON.parse(e.target.result);
+                    if (!Array.isArray(imported)) throw new Error('Neplatný formát');
+                    caps = imported;
+                    saveData();
+                    renderAll();
+                    closeBackupModal();
+                    showToast(`Načteno ${caps.length} druhů víček ze zálohy.`);
+                } catch (err) {
+                    showToast('Soubor nemá platný formát zálohy.', 'error');
+                }
+                event.target.value = '';
+            };
+            reader.readAsText(file);
+        }
+
+        function loadSampleData() {
+            caps = [...SAMPLE_CAPS];
+            saveData();
+            renderAll();
+            showToast('Ukázková sbírka byla načtena.');
+        }
+
+        function resetToSampleData() {
+            closeBackupModal();
+            openConfirmModal(
+                'Obnovit ukázková data?',
+                'Aktuální sbírka bude nahrazena ukázkovými víčky.',
+                () => {
+                    loadSampleData();
+                }
+            );
+        }
+
+        function confirmClearAll() {
+            closeBackupModal();
+            openConfirmModal(
+                'Smazat celou sbírku?',
+                'Tímto trvale vymažete všechna uložená víčka z prohlížeče.',
+                () => {
+                    caps = [];
+                    saveData();
+                    renderAll();
+                    showToast('Celá sbírka byla vymazána.');
+                }
+            );
+        }
+
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            const bgClass = type === 'error'
+                ? 'bg-rose-950 border-rose-700 text-rose-100'
+                : 'bg-slate-900 border-amber-500/50 text-white';
+            toast.className = `pointer-events-auto px-4 py-3 rounded-xl border shadow-xl text-sm font-medium flex items-center gap-2.5 transition-all duration-300 ${bgClass}`;
+            toast.innerHTML = `
+                <span class="w-2 h-2 rounded-full ${type === 'error' ? 'bg-rose-400' : 'bg-amber-400'}"></span>
+                <span>${escapeHtml(message)}</span>
+            `;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateY(8px)';
+                setTimeout(() => toast.remove(), 300);
+            }, 3200);
+        }
+    </script>
+</body>
+</html>
